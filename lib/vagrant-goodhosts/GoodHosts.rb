@@ -7,11 +7,6 @@ module VagrantPlugins
       def getIps
         ips = []
 
-        if ip = getAwsPublicIp
-          ips.push(ip)
-        elsif ip = getGooglePublicIp
-          ips.push(ip)
-        else
             @machine.config.vm.networks.each do |network|
               key, options = network[0], network[1]
               ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
@@ -19,7 +14,6 @@ module VagrantPlugins
               if options[:goodhosts] == 'skip'
                 @ui.info '[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)'
             end
-          end
         end
       end
 
@@ -58,7 +52,7 @@ module VagrantPlugins
         entries = []
         ips.each do |ip|
           hostnames[ip].each do |hostname|
-              system("./cli", "a", ip, hostname)
+              system("/home/mte90/Desktop/cli_linux_amd64/cli", "a", ip, hostname)
               entries.push(hostEntry)
           end
         end
@@ -70,7 +64,7 @@ module VagrantPlugins
         entries = []
         ips.each do |ip|
           hostnames[ip].each do |hostname|
-              system("./cli", "r", ip, hostname)
+              system("/home/mte90/Desktop/cli_linux_amd64/cli", "r", ip, hostname)
               entries.push(hostEntry)
           end
         end
