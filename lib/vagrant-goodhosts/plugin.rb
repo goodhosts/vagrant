@@ -2,9 +2,9 @@ require "vagrant-goodhosts/Action/UpdateHosts"
 require "vagrant-goodhosts/Action/RemoveHosts"
 
 module VagrantPlugins
-  module HostsUpdater
+  module GoodHosts
     class Plugin < Vagrant.plugin('2')
-      name 'HostsUpdater'
+      name 'GoodHosts'
       description <<-DESC
         This plugin manages the /etc/hosts file for the host machine. An entry is
         created for the hostname attribute in the vm.config.

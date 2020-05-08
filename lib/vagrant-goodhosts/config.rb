@@ -1,7 +1,7 @@
 require "vagrant"
 
 module VagrantPlugins
-  module HostsUpdater
+  module GoodHosts
     class Config < Vagrant.plugin("2", :config)
         attr_accessor :aliases
         attr_accessor :id

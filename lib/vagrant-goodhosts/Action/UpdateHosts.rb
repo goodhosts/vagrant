@@ -1,4 +1,4 @@
-require_relative "../HostsUpdater"
+require_relative "../GoodHosts"
 module VagrantPlugins
   module GoodHosts
     module Action

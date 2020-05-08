@@ -21,6 +21,7 @@ module VagrantPlugins
             end
           end
         end
+      end
 
       # Get a hash of hostnames indexed by ip, e.g. { 'ip1': ['host1'], 'ip2': ['host2', 'host3'] }
       def getHostnames(ips)
