@@ -54,7 +54,7 @@ module VagrantPlugins
               ip_address = ip[1][:ip]
               if !ip_address.nil?
                 @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"
-                system("./cli", "a", ip, hostname)
+                system("./cli", "a", ip_address, hostname)
               end
           end
         end
@@ -67,7 +67,7 @@ module VagrantPlugins
           hostnames[ip].each do |hostname|
               ip_address = ip[1][:ip]
               if !ip_address.nil?
-                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"
+                @ui.info "[vagrant-goodhosts]   remove entry for: #{ip_address} #{hostname}"
                 system("./cli", "r", ip_address, hostname)
               end
           end
