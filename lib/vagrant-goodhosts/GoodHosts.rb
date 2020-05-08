@@ -49,11 +49,13 @@ module VagrantPlugins
       def addHostEntries
         ips = getIps
         hostnames = getHostnames(ips)
-        entries = []
         ips.each do |ip|
           hostnames[ip].each do |hostname|
-              system("/home/mte90/Desktop/cli_linux_amd64/cli", "a", ip, hostname)
-              entries.push(hostEntry)
+              ip_address = ip[1][:ip]
+              if !ip_address.nil?
+                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"
+                system("./cli", "a", ip, hostname)
+              end
           end
         end
       end
@@ -61,11 +63,13 @@ module VagrantPlugins
       def removeHostEntries
         ips = getIps
         hostnames = getHostnames(ips)
-        entries = []
         ips.each do |ip|
           hostnames[ip].each do |hostname|
-              system("/home/mte90/Desktop/cli_linux_amd64/cli", "r", ip, hostname)
-              entries.push(hostEntry)
+              ip_address = ip[1][:ip]
+              if !ip_address.nil?
+                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"
+                system("./cli", "r", ip_address, hostname)
+              end
           end
         end
       end
