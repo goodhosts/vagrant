@@ -1,6 +1,5 @@
-require "vagrant-hostsupdater/Action/UpdateHosts"
-require "vagrant-hostsupdater/Action/CacheHosts"
-require "vagrant-hostsupdater/Action/RemoveHosts"
+require "vagrant-goodhosts/Action/UpdateHosts"
+require "vagrant-goodhosts/Action/RemoveHosts"
 
 module VagrantPlugins
   module HostsUpdater
@@ -11,46 +10,46 @@ module VagrantPlugins
         created for the hostname attribute in the vm.config.
       DESC
 
-      config(:hostsupdater) do
+      config(:goodhosts) do
         require_relative 'config'
         Config
       end
 
-      action_hook(:hostsupdater, :machine_action_up) do |hook|
+      action_hook(:goodhosts, :machine_action_up) do |hook|
         hook.append(Action::UpdateHosts)
       end
 
-      action_hook(:hostsupdater, :machine_action_provision) do |hook|
+      action_hook(:goodhosts, :machine_action_provision) do |hook|
         hook.before(Vagrant::Action::Builtin::Provision, Action::UpdateHosts)
       end
 
-      action_hook(:hostsupdater, :machine_action_halt) do |hook|
+      action_hook(:goodhosts, :machine_action_halt) do |hook|
         hook.append(Action::RemoveHosts)
       end
 
-      action_hook(:hostsupdater, :machine_action_suspend) do |hook|
+      action_hook(:goodhosts, :machine_action_suspend) do |hook|
         hook.append(Action::RemoveHosts)
       end
 
-      action_hook(:hostsupdater, :machine_action_destroy) do |hook|
+      action_hook(:goodhosts, :machine_action_destroy) do |hook|
         hook.prepend(Action::CacheHosts)
       end
 
-      action_hook(:hostsupdater, :machine_action_destroy) do |hook|
+      action_hook(:goodhosts, :machine_action_destroy) do |hook|
         hook.append(Action::RemoveHosts)
       end
 
-      action_hook(:hostsupdater, :machine_action_reload) do |hook|
+      action_hook(:goodhosts, :machine_action_reload) do |hook|
         hook.prepend(Action::RemoveHosts)
         hook.append(Action::UpdateHosts)
       end
 
-      action_hook(:hostsupdater, :machine_action_resume) do |hook|
+      action_hook(:goodhosts, :machine_action_resume) do |hook|
         hook.prepend(Action::RemoveHosts)
         hook.append(Action::UpdateHosts)
       end
 
-      command(:hostsupdater) do
+      command(:goodhosts) do
         require_relative 'command'
         Command
       end

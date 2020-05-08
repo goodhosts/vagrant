@@ -1,8 +1,8 @@
-require "vagrant-hostsupdater/version"
-require "vagrant-hostsupdater/plugin"
+require "vagrant-goodhosts/version"
+require "vagrant-goodhosts/plugin"
 
 module VagrantPlugins
-  module HostsUpdater
+  module GoodHosts
     def self.source_root
       @source_root ||= Pathname.new(File.expand_path('../../', __FILE__))
     end
