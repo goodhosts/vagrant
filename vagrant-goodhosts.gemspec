@@ -5,12 +5,12 @@ require 'vagrant-goodhosts/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'vagrant-goodhosts'
-  spec.version       = VagrantPlugins::HostsUpdater::VERSION
-  spec.authors       = ['Falk Kühnel', 'Chris Smith']
-  spec.email         = ['fk@cogitatio.de', 'chris@cgsmith.net']
-  spec.description   = %q{Enables Vagrant to update hosts file on the host machine}
+  spec.version       = VagrantPlugins::GoodHosts::VERSION
+  spec.authors       = ['Daniele Scasciafratte']
+  spec.email         = ['mte90net@gmail.com']
+  spec.description   = %q{Enables Vagrant to update hosts file on the host machine with goodhosts}
   spec.summary       = spec.description
-  spec.homepage      = 'https://github.com/cogitatio/vagrant-goodhosts'
+  spec.homepage      = 'https://github.com/mte90/vagrant-goodhosts'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
