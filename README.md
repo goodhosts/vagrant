@@ -1,6 +1,6 @@
 # Vagrant::Goodhosts
 
-This plugin adds an entry to your /etc/hosts file on the host system.
+This plugin adds an entry to your /etc/hosts file on the host system using [GoodHosts](https://github.com/goodhosts/cli). This plugin is based on [vagrant-hostsupdater](https://github.com/cogitatio/vagrant-hostsupdater) to be compatible with the same config parameters.
 
 On **up**, **resume** and **reload** commands, it tries to add the information, if it does not already exist in your hosts file. If it needs to be added, you will be asked for an administrator password, since it uses sudo to edit the file.
 
@@ -50,20 +50,6 @@ This will produce `/etc/hosts` entries like so:
     10.0.0.1 bar.com
     10.0.0.2 baz.com
     10.0.0.2 bat.com
-
-### Skipping hostupdater
-
-To skip adding some entries to the /etc/hosts file add `goodhosts: "skip"` option to network configuration:
-
-    config.vm.network "private_network", ip: "172.21.9.9", goodhosts: "skip"
-
-Example:
-
-    config.vm.network :private_network, ip: "192.168.50.4"
-    config.vm.network :private_network,
-        ip: "172.21.9.9",
-        netmask: "255.255.240.0",
-        goodhosts: "skip"
         
 ### Keeping Host Entries After Suspend/Halt
 
@@ -121,4 +107,3 @@ git checkout develop
 gem build vagrant-goodhosts.gemspec
 vagrant plugin install vagrant-goodhosts-*.gem
 ```
-
