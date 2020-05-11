@@ -1,4 +1,4 @@
-require 'open3'
+require 'rbconfig'
 
 module VagrantPlugins
   module GoodHosts
@@ -15,6 +15,38 @@ module VagrantPlugins
                 @ui.info '[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)'
             end
         end
+      end
+      
+      # https://stackoverflow.com/a/13586108/1902215
+      def get_OS
+        return os ||= (
+        host_os = RbConfig::CONFIG['host_os']
+        case host_os
+        when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+            :windows
+        when /darwin|mac os/
+            :macosx
+        when /linux/
+            :linux
+        else
+            raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
+        end
+        )
+      end
+      
+      def get_cli
+          os = get_OS
+          puts __FILE__
+          path = File.expand_path(File.dirname(File.dirname(__FILE__))) + '/vagrant-goodhosts/bundle/cli/'
+          if os == 'linux'
+              path = path + 'cli'
+          elseif os == 'macosc'
+              path = path + 'cli.dmg'
+          elseif os == 'windows'
+              path = path + 'cli.exe'
+          end
+          
+          return path
       end
 
       # Get a hash of hostnames indexed by ip, e.g. { 'ip1': ['host1'], 'ip2': ['host2', 'host3'] }
@@ -54,7 +86,7 @@ module VagrantPlugins
               ip_address = ip[1][:ip]
               if !ip_address.nil?
                 @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"
-                system("./cli", "a", ip_address, hostname)
+                system(get_cli, "a", ip_address, hostname)
               end
           end
         end
@@ -68,7 +100,7 @@ module VagrantPlugins
               ip_address = ip[1][:ip]
               if !ip_address.nil?
                 @ui.info "[vagrant-goodhosts]   remove entry for: #{ip_address} #{hostname}"
-                system("./cli", "r", ip_address, hostname)
+                system(get_cli, "r", ip_address, hostname)
               end
           end
         end
