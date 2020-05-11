@@ -36,7 +36,6 @@ module VagrantPlugins
       
       def get_cli
           os = get_OS
-          puts __FILE__
           path = File.expand_path(File.dirname(File.dirname(__FILE__))) + '/vagrant-goodhosts/bundle/cli/'
           if os == 'linux'
               path = path + 'cli'
