@@ -104,6 +104,6 @@ If you would like to install vagrant-goodhosts on the development version perfor
 git clone https://github.com/mte90/vagrant-goodhosts
 cd vagrant-goodhosts
 git checkout develop
-gem build vagrant-goodhosts.gemspec
+./package.sh
 vagrant plugin install vagrant-goodhosts-*.gem
 ```
