@@ -36,7 +36,7 @@ module VagrantPlugins
       
       def get_cli
           cli = get_OS
-          path = File.expand_path(File.dirname(File.dirname(__FILE__))) + '/vagrant-goodhosts/bundle/cli/'
+          path = File.expand_path(File.dirname(File.dirname(__FILE__))) + '/vagrant-goodhosts/bundle/'
           path = "#{path}#{cli}"
           
           return path
@@ -78,8 +78,8 @@ module VagrantPlugins
           hostnames[ip].each do |hostname|
               ip_address = ip[1][:ip]
               if !ip_address.nil?
-                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"                
-                system(get_cli, "a", ip_address, hostname)
+                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"  
+                system(get_cli, "a", ip_address, hostname, :err => File::NULL)
               end
           end
         end
@@ -93,7 +93,7 @@ module VagrantPlugins
               ip_address = ip[1][:ip]
               if !ip_address.nil?
                 @ui.info "[vagrant-goodhosts]   remove entry for: #{ip_address} #{hostname}"
-                system(get_cli, "r", ip_address, hostname)
+                system(get_cli, "r", ip_address, hostname, :err => File::NULL)
               end
           end
         end
