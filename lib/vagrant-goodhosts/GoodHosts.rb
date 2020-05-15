@@ -10,6 +10,7 @@ module VagrantPlugins
             @machine.config.vm.networks.each do |network|
               key, options = network[0], network[1]
               ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
+              ip = ip || (@machine.ssh_info ? @machine.ssh_info[:host] : nil)
               ips.push(ip) if ip
               if options[:goodhosts] == 'skip'
                 @ui.info '[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)'
