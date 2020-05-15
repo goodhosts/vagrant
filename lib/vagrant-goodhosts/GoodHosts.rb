@@ -23,11 +23,11 @@ module VagrantPlugins
         host_os = RbConfig::CONFIG['host_os']
         case host_os
         when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-            :windows
+            :'cli.exe'
         when /darwin|mac os/
-            :macosx
+            :'cli_osx'
         when /linux/
-            :linux
+            :'cli'
         else
             raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
         end
@@ -35,15 +35,9 @@ module VagrantPlugins
       end
       
       def get_cli
-          os = get_OS
+          cli = get_OS
           path = File.expand_path(File.dirname(File.dirname(__FILE__))) + '/vagrant-goodhosts/bundle/cli/'
-          if os == 'linux'
-              path = path + 'cli'
-          elseif os == 'macosc'
-              path = path + 'cli.dmg'
-          elseif os == 'windows'
-              path = path + 'cli.exe'
-          end
+          path = "#{path}#{cli}"
           
           return path
       end
@@ -84,7 +78,7 @@ module VagrantPlugins
           hostnames[ip].each do |hostname|
               ip_address = ip[1][:ip]
               if !ip_address.nil?
-                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"
+                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"                
                 system(get_cli, "a", ip_address, hostname)
               end
           end
