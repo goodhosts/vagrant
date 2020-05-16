@@ -1,4 +1,5 @@
 require 'rbconfig'
+require 'open3'
 
 module VagrantPlugins
   module GoodHosts
@@ -8,6 +9,7 @@ module VagrantPlugins
         if Vagrant.has_plugin?("vagrant-hostsupdater")
             @ui.error "The Vagrant plugin vagrant-hostsupdater is installed but is executed always also when is not configured in your Vagrantfile!" 
         end
+        
         ips = []
 
             @machine.config.vm.networks.each do |network|
@@ -15,13 +17,13 @@ module VagrantPlugins
               ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
               ips.push(ip) if ip
               if options[:goodhosts] == 'skip'
-                @ui.info('[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)')
+                @ui.info '[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)'
             end
             
             @machine.config.vm.provider :hyperv do |v|
                 timeout = @machine.provider_config.ip_address_timeout
-                @ui.info("Waiting for the machine to report its IP address(might take some time, have a patience)...")
-                @ui.info("Timeout: #{timeout} seconds")
+                @ui.output("Waiting for the machine to report its IP address(might take some time, have a patience)...")
+                @ui.detail("Timeout: #{timeout} seconds")
 
                 options = {
                     vmm_server_address: @machine.provider_config.vmm_server_address,
@@ -96,29 +98,63 @@ module VagrantPlugins
       def addHostEntries
         ips = getIps
         hostnames = getHostnames(ips)
+        error = false
+        errorText = ""
+        cli = get_cli
         ips.each do |ip|
           hostnames[ip].each do |hostname|
-              ip_address = ip[1][:ip]
+              ip_address = ip
               if !ip_address.nil?
-                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"  
-                system(get_cli, "a", ip_address, hostname, :err => File::NULL)
+                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"
+                if cli.include? ".exe"
+                    stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "a", ip_address, hostname)
+                else
+                    stdin, stdout, stderr, wait_thr = Open3.popen3('sudo', cli, "a", ip_address, hostname)
+                end
+                if !wait_thr.value.success?
+                    error = true
+                    errorText = stderr.read.strip
+                end
               end
           end
         end
+        printReadme(error, errorText)
       end
 
       def removeHostEntries
         ips = getIps
         hostnames = getHostnames(ips)
+        error = false
+        errorText = ""
+        cli = get_cli
         ips.each do |ip|
           hostnames[ip].each do |hostname|
-              ip_address = ip[1][:ip]
+              ip_address = ip
               if !ip_address.nil?
                 @ui.info "[vagrant-goodhosts]   remove entry for: #{ip_address} #{hostname}"
-                system(get_cli, "r", ip_address, hostname, :err => File::NULL)
+                if cli.include? ".exe"
+                    stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "r", ip_address, hostname)
+                else
+                    stdin, stdout, stderr, wait_thr = Open3.popen3('sudo', cli, "r", ip_address, hostname)
+                end
+                if !wait_thr.value.success?
+                    error = true
+                    errorText = stderr.read.strip
+                end
               end
           end
         end
+        printReadme(error, errorText)
+      end
+      
+      def printReadme(error, errorText)
+        if error
+            cli = get_cli
+            @ui.error "[vagrant-goodhosts] Issue on executing goodhosts: #{errorText}"
+            @ui.error "[vagrant-goodhosts] Cli path: #{cli}"            
+            @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/Mte90/vagrant-goodhosts#passwordless-sudo"
+        end
+          
       end
 
     end
