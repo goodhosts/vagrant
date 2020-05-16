@@ -12,8 +12,27 @@ module VagrantPlugins
               ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
               ips.push(ip) if ip
               if options[:goodhosts] == 'skip'
-                @ui.info '[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)'
+                @ui.info('[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)')
             end
+            
+            @machine.config.vm.provider :hyperv do |v|
+                timeout = @machine.provider_config.ip_address_timeout
+                @ui.info("Waiting for the machine to report its IP address(might take some time, have a patience)...")
+                @ui.info("Timeout: #{timeout} seconds")
+
+                options = {
+                    vmm_server_address: @machine.provider_config.vmm_server_address,
+                    proxy_server_address: @machine.provider_config.proxy_server_address,
+                    timeout: timeout,
+                    machine: @machine
+                }
+                network = @machine.provider.driver.read_guest_ip(options)
+                if network["ip"]
+                    ips.push( network["ip"] ) unless ips.include? network["ip"]
+                end
+            end
+            
+            return ips
         end
       end
       
