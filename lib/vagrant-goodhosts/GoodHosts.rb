@@ -5,6 +5,9 @@ module VagrantPlugins
     module GoodHosts
 
       def getIps
+        if Vagrant.has_plugin?("vagrant-hostsupdater")
+            @ui.error "The Vagrant plugin vagrant-hostsupdater is installed but is executed always also when is not configured in your Vagrantfile!" 
+        end
         ips = []
 
             @machine.config.vm.networks.each do |network|
