@@ -32,10 +32,6 @@ module VagrantPlugins
       end
 
       action_hook(:goodhosts, :machine_action_destroy) do |hook|
-        hook.prepend(Action::CacheHosts)
-      end
-
-      action_hook(:goodhosts, :machine_action_destroy) do |hook|
         hook.append(Action::RemoveHosts)
       end
 
