@@ -90,7 +90,7 @@ You have to open an elevated command prompt; hold `❖ Win` and press `X`, then 
 If you would like to install vagrant-goodhosts on the development version perform the following:
 
 ```
-git clone https://github.com/mte90/vagrant-goodhosts
+git clone https://github.com/goodhosts/vagrant
 cd vagrant-goodhosts
 git checkout develop
 ./package.sh
