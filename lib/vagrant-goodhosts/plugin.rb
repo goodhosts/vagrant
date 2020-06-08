@@ -44,11 +44,6 @@ module VagrantPlugins
         hook.prepend(Action::RemoveHosts)
         hook.append(Action::UpdateHosts)
       end
-
-      command(:goodhosts) do
-        require_relative 'command'
-        Command
-      end
     end
   end
 end
