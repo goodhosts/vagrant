@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['mte90net@gmail.com']
   spec.description   = %q{Enables Vagrant to update hosts file on the host machine with goodhosts}
   spec.summary       = spec.description
-  spec.homepage      = 'https://github.com/mte90/vagrant-goodhosts'
+  spec.homepage      = 'https://github.com/goodhosts/vagrant'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
