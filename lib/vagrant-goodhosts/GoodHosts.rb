@@ -7,7 +7,7 @@ module VagrantPlugins
 
       def getIps
         if Vagrant.has_plugin?("vagrant-hostsupdater")
-            @ui.error "The Vagrant plugin vagrant-hostsupdater is installed but is executed always also when is not configured in your Vagrantfile!" 
+            @ui.error "[vagrant-goodhosts] Warning: The vagrant-hostsupdater plugin is installed, hostsupdater always adds the VM name even if the VagrantFile says not to. This shouldn't cause issues, but if it does, uninstall hostsupdater" 
         end
         
         ips = []
@@ -22,7 +22,7 @@ module VagrantPlugins
             
             @machine.config.vm.provider :hyperv do |v|
                 timeout = @machine.provider_config.ip_address_timeout
-                @ui.output("Waiting for the machine to report its IP address(might take some time, have a patience)...")
+                @ui.output("[vagrant-goodhosts] Waiting for the guest machine to report its IP address ( this might take some time, have patience )...")
                 @ui.detail("Timeout: #{timeout} seconds")
 
                 options = {
@@ -105,7 +105,7 @@ module VagrantPlugins
           hostnames[ip].each do |hostname|
               ip_address = ip
               if !ip_address.nil?
-                @ui.info "[vagrant-goodhosts]   found entry for: #{ip_address} #{hostname}"
+                @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
                 if cli.include? ".exe"
                     stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "a", ip_address, hostname)
                 else
@@ -131,7 +131,7 @@ module VagrantPlugins
           hostnames[ip].each do |hostname|
               ip_address = ip
               if !ip_address.nil?
-                @ui.info "[vagrant-goodhosts]   remove entry for: #{ip_address} #{hostname}"
+                @ui.info "[vagrant-goodhosts] - remove entry for: #{ip_address} #{hostname}"
                 if cli.include? ".exe"
                     stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "r", ip_address, hostname)
                 else
@@ -150,11 +150,11 @@ module VagrantPlugins
       def printReadme(error, errorText)
         if error
             cli = get_cli
-            @ui.error "[vagrant-goodhosts] Issue on executing goodhosts: #{errorText}"
-            @ui.error "[vagrant-goodhosts] Cli path: #{cli}"            
-            @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/Mte90/vagrant-goodhosts#passwordless-sudo"
+            @ui.error "[vagrant-goodhosts] Issue executing goodhosts CLI: #{errorText}"
+            @ui.error "[vagrant-goodhosts] Cli path: #{cli}"
+            @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#passwordless-sudo"
         end
-          
+
       end
 
     end
