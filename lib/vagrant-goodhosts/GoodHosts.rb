@@ -7,7 +7,7 @@ module VagrantPlugins
 
       def getIps
         if Vagrant.has_plugin?("vagrant-hostsupdater")
-            @ui.error "[vagrant-goodhosts] Warning: The vagrant-hostsupdater plugin is installed, hostsupdater always adds the VM name even if the VagrantFile says not to. This shouldn't cause issues, but if it does, uninstall hostsupdater" 
+            @ui.warn "[vagrant-goodhosts] Warning: The vagrant-hostsupdater plugin is installed, hostsupdater always adds the VM name even if the VagrantFile says not to. This shouldn't cause issues, but if it does, uninstall hostsupdater" 
         end
         
         ips = []
