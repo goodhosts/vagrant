@@ -96,6 +96,8 @@ For Ubuntu and most Linux environments:
 For MacOS:
 
     %admin ALL=(root) NOPASSWD: [the-path]
+    
+Replace in both %sudo/%admin with the username it if it is not working for you.
 
 ### Windows: UAC Prompt
 
