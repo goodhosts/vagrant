@@ -87,7 +87,7 @@ If you understand the risks that go with supressing them, here's how to do it.
 ### Linux/OS X: Passwordless sudo
 
 To allow vagrant to automatically update the hosts file without asking for a sudo password, add one of the following snippets to a new sudoers file include, i.e. `sudo visudo -f /etc/sudoers.d/vagrant_goodhosts`.  
-Change the cli path as printed in the vagrant output.
+The command path is printed when there are errors with sudo.
 
 For Ubuntu and most Linux environments:
 
