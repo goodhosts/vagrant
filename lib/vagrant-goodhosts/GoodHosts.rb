@@ -135,7 +135,12 @@ module VagrantPlugins
           cli = get_cli
           @ui.error "[vagrant-goodhosts] Issue executing goodhosts CLI: #{errorText}"
           @ui.error "[vagrant-goodhosts] Cli path: #{cli}"
-          @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#passwordless-sudo"
+          if cli.include? ".exe"
+            @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#windows-uac-prompt"
+            exit
+          else
+            @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#passwordless-sudo"
+          end
         end
       end
 
