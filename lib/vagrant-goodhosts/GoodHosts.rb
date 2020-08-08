@@ -36,12 +36,13 @@ module VagrantPlugins
             end
           end
 
-          return ips
+          
         end
+        return ips
       end
 
       # https://stackoverflow.com/a/13586108/1902215
-      def get_OS
+      def get_os_binary
         return os ||= (host_os = RbConfig::CONFIG["host_os"]
                  case host_os
                when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
@@ -56,9 +57,9 @@ module VagrantPlugins
       end
 
       def get_cli
-        cli = get_OS
+        binary = get_os_binary
         path = File.expand_path(File.dirname(File.dirname(__FILE__))) + "/vagrant-goodhosts/bundle/"
-        path = "#{path}#{cli}"
+        path = "#{path}#{binary}"
 
         return path
       end
@@ -99,9 +100,9 @@ module VagrantPlugins
         hostnames_by_ips = generateHostnamesByIps
         hostnames_by_ips.each do |hostnames, ip_address|
           if cli.include? ".exe"
-            stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "a", ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "add", ip_address, hostnames)
           else
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "a", ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", ip_address, hostnames)
           end
           if !wait_thr.value.success?
             error = true
@@ -117,10 +118,14 @@ module VagrantPlugins
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
         hostnames_by_ips.each do |hostnames, ip_address|
+          if !ip_address.nil?
+            @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
+            next
+          end
           if cli.include? ".exe"
-            stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "r", ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "remove", ip_address, hostnames)
           else
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "r", ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "remove", ip_address, hostnames)
           end
           if !wait_thr.value.success?
             error = true
@@ -153,7 +158,7 @@ module VagrantPlugins
             ip_address = ip
             hostnames[ip].each do |hostname|
               if !ip_address.nil?
-                @ui.info "[vagrant-goodhosts] - remove entry for: #{ip_address} #{hostname}"
+                @ui.info "[vagrant-goodhosts] - removing entry for: #{ip_address} #{hostname}"
               end
             end
             hostnames_by_ips = { ip_address => hostnames[ip].join(" ") }
@@ -162,7 +167,7 @@ module VagrantPlugins
           ip_address = ips[0]
           hostnames[ip_address].each do |hostname|
             if !ip_address.nil?
-              @ui.info "[vagrant-goodhosts] - remove entry for: #{ip_address} #{hostname}"
+              @ui.info "[vagrant-goodhosts] - removing entry for: #{ip_address} #{hostname}"
             end
           end
           hostnames_by_ips = { ip_address => hostnames[ip_address].join(" ") }
