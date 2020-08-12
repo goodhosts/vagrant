@@ -98,7 +98,11 @@ module VagrantPlugins
         errorText = ""
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
-        hostnames_by_ips.each do |hostnames, ip_address|
+        hostnames_by_ips.each do |ip_address, hostnames|
+          if ip_address.nil?
+            @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
+            next
+          end
           if cli.include? ".exe"
             stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "add", ip_address, hostnames)
           else
@@ -117,8 +121,8 @@ module VagrantPlugins
         errorText = ""
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
-        hostnames_by_ips.each do |hostnames, ip_address|
-          if !ip_address.nil?
+        hostnames_by_ips.each do |ip_address, hostnames|
+          if ip_address.nil?
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
           end
@@ -158,7 +162,7 @@ module VagrantPlugins
             ip_address = ip
             hostnames[ip].each do |hostname|
               if !ip_address.nil?
-                @ui.info "[vagrant-goodhosts] - removing entry for: #{ip_address} #{hostname}"
+                @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
               end
             end
             hostnames_by_ips = { ip_address => hostnames[ip].join(" ") }
@@ -167,7 +171,7 @@ module VagrantPlugins
           ip_address = ips[0]
           hostnames[ip_address].each do |hostname|
             if !ip_address.nil?
-              @ui.info "[vagrant-goodhosts] - removing entry for: #{ip_address} #{hostname}"
+              @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
             end
           end
           hostnames_by_ips = { ip_address => hostnames[ip_address].join(" ") }
