@@ -104,9 +104,9 @@ module VagrantPlugins
             next
           end
           if cli.include? ".exe"
-            stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "add", ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "add", "-c", ip_address, hostnames)
           else
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", "-c", ip_address, hostnames)
           end
           if !wait_thr.value.success?
             error = true
@@ -127,9 +127,9 @@ module VagrantPlugins
             next
           end
           if cli.include? ".exe"
-            stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "remove", ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3(cli, "remove", "-c", ip_address, hostnames)
           else
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "remove", ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "remove", "-c", ip_address, hostnames)
           end
           if !wait_thr.value.success?
             error = true
