@@ -81,15 +81,6 @@ module VagrantPlugins
           end
         end
 
-        # handle default hostname(s) if not already specified in the aliases
-        Array(@machine.config.vm.hostname).each do |host|
-          if hostnames.none? { |k, v| v.include?(host) }
-            ips.each do |ip|
-              hostnames[ip].unshift host
-            end
-          end
-        end
-
         return hostnames
       end
 

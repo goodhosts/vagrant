@@ -5,7 +5,6 @@ module VagrantPlugins
       class UpdateHosts
         include GoodHosts
 
-
         def initialize(app, env)
           @app = app
           @machine = env[:machine]
