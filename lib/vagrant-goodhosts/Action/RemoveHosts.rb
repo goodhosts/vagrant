@@ -8,13 +8,13 @@ module VagrantPlugins
           @app = app
           @machine = env[:machine]
           @ui = env[:ui]
+          @first = false
         end
 
         def call(env)
           machine_action = env[:machine_action]
           if machine_action != :destroy || !@machine.id
             if machine_action != :suspend || false != @machine.config.goodhosts.remove_on_suspend
-              @first ||= false
               unless @first
                 @first = true
                 if machine_action != :halt || false != @machine.config.goodhosts.remove_on_suspend
