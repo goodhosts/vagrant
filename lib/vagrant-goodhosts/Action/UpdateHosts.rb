@@ -9,16 +9,16 @@ module VagrantPlugins
           @app = app
           @machine = env[:machine]
           @ui = env[:ui]
+          @first = false
         end
 
         def call(env)
-          @first ||= false
           unless @first
             @first = true
             @ui.info "[vagrant-goodhosts] Checking for host entries"
             addHostEntries()
-            @app.call(env)
           end
+          @app.call(env)
         end
 
       end
