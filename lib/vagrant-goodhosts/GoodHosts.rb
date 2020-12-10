@@ -16,7 +16,7 @@ module VagrantPlugins
           ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
           ips.push(ip) if ip
           if options[:goodhosts] == "skip"
-            @ui.info '[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)'
+            @ui.info '[vagrant-goodhosts] Skipped adding host entries (config.vm.network goodhosts: "skip" is set)'
           end
 
           @machine.config.vm.provider :hyperv do |v|
@@ -90,11 +90,10 @@ module VagrantPlugins
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
 
-        if not hostnames_by_ips.any?
-          return
-        end
+        return unless hostnames_by_ips.any?
 
         hostnames_by_ips.each do |ip_address, hostnames|
+          next unless hostnames.any?
           if ip_address.nil?
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
@@ -118,11 +117,10 @@ module VagrantPlugins
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
 
-        if not hostnames_by_ips.any?
-          return
-        end
+        return unless hostnames_by_ips.any?
 
         hostnames_by_ips.each do |ip_address, hostnames|
+          next unless hostnames.any?
           if ip_address.nil?
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
