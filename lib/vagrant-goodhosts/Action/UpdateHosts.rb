@@ -4,17 +4,18 @@ module VagrantPlugins
     module Action
       class UpdateHosts
         include GoodHosts
+        @@updated = false
 
         def initialize(app, env)
           @app = app
           @machine = env[:machine]
           @ui = env[:ui]
-          @first = false
         end
 
         def call(env)
-          unless @first
-            @first = true
+          machine_action = env[:machine_action]
+          unless @@updated
+            @@updated = true
             @ui.info "[vagrant-goodhosts] Checking for host entries"
             addHostEntries()
           end
