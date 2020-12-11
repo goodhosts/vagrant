@@ -1,16 +1,35 @@
+# OS-specific
+.DS_Store
+
+# editors
+*.swp
+
+# Bundler/Rubygems
 *.gem
+.bundle
+pkg/*
+tags
+Gemfile.lock
+
+# Vagrant
+.vagrant
+Vagrantfile
+!example_box/Vagrantfile
+
+# RVM files for gemset/ruby setting
+.ruby-*
+.rvmrc
+
 .idea
 *.rbc
 .bundle
 .config
 .yardoc
-Gemfile.lock
 InstalledFiles
 _yardoc
 coverage
 doc/
 lib/bundler/man
-pkg
 rdoc
 spec/reports
 test/tmp
