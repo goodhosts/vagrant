@@ -13,7 +13,6 @@ module VagrantPlugins
         end
 
         def call(env)
-          machine_action = env[:machine_action]
           unless @@updated
             @@updated = true
             @ui.info "[vagrant-goodhosts] Checking for host entries"
