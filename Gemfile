@@ -1,9 +1,9 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 group :development do
-  gem 'vagrant', :git => 'git://github.com/mitchellh/vagrant.git', :tag => 'v1.6.2'
+  gem "vagrant", git: "https://github.com/hashicorp/vagrant.git"
 end
 
 group :plugins do
-  gemspec
+  gem "vagrant-goodhosts", path: "."
 end
