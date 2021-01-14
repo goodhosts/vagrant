@@ -79,6 +79,12 @@ module VagrantPlugins
 
         return hostnames
       end
+      
+      def shouldClean()
+        unless ip_address.nil?
+          return ( machine.config.goodhosts.clean == true )
+        return false
+      end
 
       def addHostEntries
         error = false
@@ -94,10 +100,15 @@ module VagrantPlugins
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
           end
+          clean  = ''
           if cli.include? ".exe"
-            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",\"--clean\",\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+            if shouldClean()
+              clean = "\"--clean\","
+            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
           else
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", "--clean", ip_address, hostnames)
+            if shouldClean()
+              clean = "--clean"
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", clean, ip_address, hostnames)
           end
           if !wait_thr.value.success?
             error = true
