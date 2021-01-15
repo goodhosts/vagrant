@@ -86,10 +86,10 @@ module VagrantPlugins
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
 
-        return if hostnames_by_ips.empty?
+        return unless hostnames_by_ips.any?
 
         hostnames_by_ips.each do |ip_address, hostnames|
-          next if hostnames.empty?
+          next unless hostnames.any?
           if ip_address.nil?
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
@@ -113,10 +113,11 @@ module VagrantPlugins
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
 
-        return if hostnames_by_ips.empty?
+        return unless hostnames_by_ips.any?
 
         hostnames_by_ips.each do |ip_address, hostnames|
-          next if hostnames.empty?
+          next unless hostnames.any?
+          
           if ip_address.nil?
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
