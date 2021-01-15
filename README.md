@@ -83,7 +83,7 @@ This disables `vagrant-goodhosts` from running on **suspend** and **halt**.
 If you don't want `/etc/hosts` file cleaned add in your `VagrantFile`:
 
 ```ruby
-config.goodhosts.clean = true
+config.goodhosts.disable_clean = true
 ```
 
 This disables `vagrant-goodhosts` from running the clean command.
