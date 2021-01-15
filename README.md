@@ -78,6 +78,15 @@ config.goodhosts.remove_on_suspend = false
 
 This disables `vagrant-goodhosts` from running on **suspend** and **halt**.
 
+### Disable file hosts clean
+
+If you don't want `/etc/hosts` file cleaned add in your `VagrantFile`:
+
+```ruby
+config.goodhosts.disable_clean = true
+```
+
+This disables `vagrant-goodhosts` from running the clean command.
 
 ## Suppressing prompts for elevating privileges
 
