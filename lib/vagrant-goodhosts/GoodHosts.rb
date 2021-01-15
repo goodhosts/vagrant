@@ -5,10 +5,6 @@ module VagrantPlugins
   module GoodHosts
     module GoodHosts
       def getIps
-        if Vagrant.has_plugin?("vagrant-hostsupdater")
-          @ui.warn "[vagrant-goodhosts] Warning: The vagrant-hostsupdater plugin is installed, hostsupdater always adds the VM name even if the VagrantFile says not to. This shouldn't cause issues, but if it does, uninstall hostsupdater"
-        end
-
         ips = []
 
         @machine.config.vm.networks.each do |network|
@@ -36,7 +32,7 @@ module VagrantPlugins
             end
           end
 
-          
+
         end
         return ips
       end
@@ -121,6 +117,7 @@ module VagrantPlugins
 
         hostnames_by_ips.each do |ip_address, hostnames|
           next unless hostnames.any?
+          
           if ip_address.nil?
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
@@ -155,25 +152,32 @@ module VagrantPlugins
       def generateHostnamesByIps()
         hostnames_by_ips = []
         ips = getIps
+        if ips.count() < 1
+          return hostnames_by_ips
+        end
         hostnames = getHostnames(ips)
         if ips.count() > 1
           ips.each do |ip|
             ip_address = ip
-            hostnames[ip].each do |hostname|
+            if hostnames[ip].count() > 1
+              hostnames[ip].each do |hostname|
+                if !ip_address.nil?
+                  @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
+                end
+              end
+              hostnames_by_ips = { ip_address => hostnames[ip].join(" ") }
+            end
+          end
+        else
+          ip_address = ips[0]
+          if hostnames[ip_address].count() > 1
+            hostnames[ip_address].each do |hostname|
               if !ip_address.nil?
                 @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
               end
             end
-            hostnames_by_ips = { ip_address => hostnames[ip].join(" ") }
+            hostnames_by_ips = { ip_address => hostnames[ip_address].join(" ") }
           end
-        else
-          ip_address = ips[0]
-          hostnames[ip_address].each do |hostname|
-            if !ip_address.nil?
-              @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
-            end
-          end
-          hostnames_by_ips = { ip_address => hostnames[ip_address].join(" ") }
         end
 
         return hostnames_by_ips
