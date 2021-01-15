@@ -82,7 +82,7 @@ module VagrantPlugins
       
       def shouldClean()
         unless ip_address.nil?
-          return ( machine.config.goodhosts.clean == true )
+          return ( @machine.config.goodhosts.clean == true )
         end
         return false
       end
@@ -103,12 +103,12 @@ module VagrantPlugins
           end
           clean  = ''
           if cli.include? ".exe"
-            if shouldClean()
+            if shouldClean(ip_address)
               clean = "\"--clean\","
             end
             stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
           else
-            if shouldClean()
+            if shouldClean(ip_address)
               clean = "--clean"
             end
             stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", clean, ip_address, hostnames)
