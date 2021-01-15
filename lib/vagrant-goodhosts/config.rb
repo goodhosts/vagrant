@@ -6,7 +6,7 @@ module VagrantPlugins
         attr_accessor :aliases
         attr_accessor :id
         attr_accessor :remove_on_suspend
-        attr_accessor_with_default :clean, false
+        attr_accessor_with_default :disable_clean, false
     end
   end
 end
