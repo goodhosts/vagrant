@@ -105,10 +105,12 @@ module VagrantPlugins
           if cli.include? ".exe"
             if shouldClean()
               clean = "\"--clean\","
+            end
             stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
           else
             if shouldClean()
               clean = "--clean"
+            end
             stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", clean, ip_address, hostnames)
           end
           if !wait_thr.value.success?
