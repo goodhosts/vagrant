@@ -80,7 +80,7 @@ module VagrantPlugins
         return hostnames
       end
       
-      def shouldClean()
+      def shouldClean(ip_address)
         unless ip_address.nil?
           return ( @machine.config.goodhosts.clean == true )
         end
