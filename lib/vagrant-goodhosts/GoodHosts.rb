@@ -103,12 +103,12 @@ module VagrantPlugins
           end
           clean  = ''
           if cli.include? ".exe"
-            if shouldClean(ip_address)
+            if not shouldClean(ip_address)
               clean = "\"--clean\","
             end
             stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
           else
-            if shouldClean(ip_address)
+            if not shouldClean(ip_address)
               clean = "--clean"
             end
             stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", clean, ip_address, hostnames)
@@ -137,9 +137,15 @@ module VagrantPlugins
             next
           end
           if cli.include? ".exe"
-            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",\"--clean\",\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+            if not shouldClean(ip_address)
+              clean = "\"--clean\","
+            end
+            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
           else
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "remove", "--clean", ip_address, hostnames)
+            if not shouldClean(ip_address)
+              clean = "--clean"
+            end
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "remove", clean, ip_address, hostnames)
           end
           if !wait_thr.value.success?
             error = true
