@@ -82,7 +82,7 @@ module VagrantPlugins
       
       def shouldClean(ip_address)
         unless ip_address.nil?
-          return @machine.config.goodhosts.clean
+          return @machine.config.goodhosts.disable_clean
         end
         return false
       end
