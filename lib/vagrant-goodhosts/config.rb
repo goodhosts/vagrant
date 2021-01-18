@@ -9,7 +9,7 @@ module VagrantPlugins
         attr_accessor :disable_clean
         
         def initialize
-            @disable_clean = false
+            @disable_clean = true
         end
     end
   end

@@ -80,7 +80,7 @@ module VagrantPlugins
         return hostnames
       end
       
-      def shouldClean(ip_address)
+      def disableClean(ip_address)
         unless ip_address.nil?
           return @machine.config.goodhosts.disable_clean
         end
@@ -100,15 +100,16 @@ module VagrantPlugins
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
           end
-          clean  = ''
           if cli.include? ".exe"
-            if not shouldClean(ip_address)
-              clean = "\"--clean\","
+            clean = "\"--clean\","
+            if disableClean(ip_address)
+                clean = ''
             end
             stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
           else
-            if not shouldClean(ip_address)
-              clean = "--clean"
+            clean = "--clean"
+            if disableClean(ip_address)
+                clean = ''
             end
             stdin, stdout, stderr, wait_thr = Open3.popen3("sudo #{cli} add #{clean} #{ip_address} #{hostnames}")
           end
@@ -134,13 +135,15 @@ module VagrantPlugins
             next
           end
           if cli.include? ".exe"
-            if not shouldClean(ip_address)
-              clean = "\"--clean\","
+            clean = "\"--clean\","
+            if disableClean(ip_address)
+                clean = ''
             end
             stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
           else
-            if not shouldClean(ip_address)
-              clean = "--clean"
+            clean = "\"--clean\","
+            if disableClean(ip_address)
+                clean = ''
             end
             stdin, stdout, stderr, wait_thr = Open3.popen3("sudo #{cli} remove #{clean} #{ip_address} #{hostnames}")
           end

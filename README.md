@@ -80,10 +80,10 @@ This disables `vagrant-goodhosts` from running on **suspend** and **halt**.
 
 ### Disable file hosts clean
 
-If you don't want `/etc/hosts` file cleaned add in your `VagrantFile`:
+If you want `/etc/hosts` file cleaned add in your `VagrantFile`:
 
 ```ruby
-config.goodhosts.disable_clean = true
+config.goodhosts.disable_clean = false
 ```
 
 This disables `vagrant-goodhosts` from running the clean command.
