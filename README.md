@@ -86,7 +86,7 @@ If you want `/etc/hosts` file cleaned add in your `VagrantFile`:
 config.goodhosts.disable_clean = false
 ```
 
-This disables `vagrant-goodhosts` from running the clean command.
+This enable `vagrant-goodhosts` from running the clean command in every call.
 
 ## Suppressing prompts for elevating privileges
 
