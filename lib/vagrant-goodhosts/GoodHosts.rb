@@ -110,7 +110,7 @@ module VagrantPlugins
             if not shouldClean(ip_address)
               clean = "--clean"
             end
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", clean, ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo #{cli} add #{clean} #{ip_address} #{hostnames}")
           end
           if !wait_thr.value.success?
             error = true
@@ -142,7 +142,7 @@ module VagrantPlugins
             if not shouldClean(ip_address)
               clean = "--clean"
             end
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "remove", clean, ip_address, hostnames)
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo #{cli} remove #{clean} #{ip_address} #{hostnames}")
           end
           if !wait_thr.value.success?
             error = true
