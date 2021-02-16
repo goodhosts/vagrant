@@ -1,5 +1,7 @@
-require "vagrant-goodhosts/Action/UpdateHosts"
-require "vagrant-goodhosts/Action/RemoveHosts"
+require_relative "GoodHosts"
+require_relative "Action/BaseAction"
+require_relative "Action/UpdateHosts"
+require_relative "Action/RemoveHosts"
 
 module VagrantPlugins
   module GoodHosts
