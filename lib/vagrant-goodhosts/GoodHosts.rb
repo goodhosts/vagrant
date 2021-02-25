@@ -7,6 +7,11 @@ module VagrantPlugins
       def getIps
         ips = []
 
+        if @machine.config.vm.networks.length == 0
+            @ui.error("[vagrant-goodhosts] No ip address found for this virtual machine")
+            exit
+        end
+        
         @machine.config.vm.networks.each do |network|
           key, options = network[0], network[1]
           ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
