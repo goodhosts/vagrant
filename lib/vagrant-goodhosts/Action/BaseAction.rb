@@ -26,9 +26,10 @@ module VagrantPlugins
           # machines and having a static flag will result in a plugin being
           # executed just once.
           # https://github.com/goodhosts/vagrant/issues/30
-          if not @@completed.key?(@machine.name)
+          @@completed[@machine.name] = [] unless @@completed.key?(@machine.name)
+          unless @@completed[@machine.name].include? self.class.name
             run(env)
-            @@completed[@machine.name] = true
+            @@completed[@machine.name] << self.class.name
           end
 
           @app.call(env)
