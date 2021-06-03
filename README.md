@@ -30,7 +30,7 @@ You currently only need the `hostname` and a `:private_network` network with a f
 
 ```ruby
 config.vm.network :private_network, ip: "192.168.3.10"
-config.vm.hostname = "www.testing.de"
+config.vm.hostname = "www.testing.de" # This is not used by the plugin
 config.goodhosts.aliases = ["alias.testing.de", "alias2.somedomain.com"]
 ```
 

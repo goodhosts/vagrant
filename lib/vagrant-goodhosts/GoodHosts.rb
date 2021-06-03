@@ -184,7 +184,7 @@ module VagrantPlugins
         if ips.count() > 1
           ips.each do |ip|
             ip_address = ip
-            if hostnames[ip].count() > 1
+            if hostnames[ip].count() > 0
               hostnames[ip].each do |hostname|
                 if !ip_address.nil?
                   @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
@@ -195,7 +195,7 @@ module VagrantPlugins
           end
         else
           ip_address = ips[0]
-          if hostnames[ip_address].count() > 1
+          if hostnames[ip_address].count() > 0
             hostnames[ip_address].each do |hostname|
               if !ip_address.nil?
                 @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
