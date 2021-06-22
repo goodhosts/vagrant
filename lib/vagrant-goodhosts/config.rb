@@ -9,6 +9,7 @@ module VagrantPlugins
         attr_accessor :disable_clean
         
         def initialize
+            @remove_on_suspend = true
             @disable_clean = true
         end
     end
