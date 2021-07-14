@@ -96,15 +96,15 @@ If you understand the risks that go with supressing them, here's how to do it.
 ### Linux/OS X: Passwordless sudo
 
 To allow vagrant to automatically update the hosts file without asking for a sudo password, add one of the following snippets to a new sudoers file include, i.e. `sudo visudo -f /etc/sudoers.d/vagrant_goodhosts`.
-The command path is printed when there are errors with sudo.
+The command path is printed when there are errors with Vagrant, check the output marked in red.
 
 For Ubuntu and most Linux environments:
 
-    %sudo ALL=(root) NOPASSWD: [the-path]
+    %sudo ALL=(root) NOPASSWD: [the-command-path]
 
 For MacOS:
 
-    %admin ALL=(root) NOPASSWD: [the-path]
+    %admin ALL=(root) NOPASSWD: [the-command-path]
 
 Replace in both %sudo/%admin with the username it if it is not working for you.
 
