@@ -178,6 +178,7 @@ module VagrantPlugins
         hostnames_by_ips = []
         ips = getIps
         if ips.count() < 1
+          @ui.error("[vagrant-goodhosts] No ip address found for this virtual machine")
           return hostnames_by_ips
         end
         hostnames = getHostnames(ips)
