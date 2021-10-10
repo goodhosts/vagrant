@@ -1,5 +1,6 @@
 require "rbconfig"
 require "open3"
+require "resolv"
 
 module VagrantPlugins
   module GoodHosts
@@ -107,13 +108,34 @@ module VagrantPlugins
             next
           end
 
-          stdin, stdout, stderr, wait_thr = add_goodhost_entries(ip_address, hostnames)
+          # filter out the hosts we've already added
+          hosts_to_add = check_hostnames_to_add( ip_address, hostnames)
+          next if not hosts_to_add.any?
+
+          stdin, stdout, stderr, wait_thr = add_goodhost_entries(ip_address, hosts_to_add)
           if !wait_thr.value.success?
             error = true
             errorText = stderr.read.strip
           end
         end
         printReadme(error, errorText)
+      end
+
+      def check_hostnames_to_add(ip_address, hostnames)
+        hostnames_to_add = Array.new
+
+        # check which hostnames actually need adding
+        hostnames.each do |hostname|
+          begin
+            address = Resolv.getaddress(hostname)
+            if address != ip_address
+              hostnames_to_add.append( hostname )
+            end
+          rescue => exception
+            hostnames_to_add.append(hostname)
+          end
+        end
+        return hostnames_to_add
       end
 
       def add_goodhost_entries(ip_address, hostnames)
