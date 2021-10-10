@@ -5,16 +5,17 @@ module VagrantPlugins
   module GoodHosts
     module GoodHosts
       def getIps
-        if Vagrant.has_plugin?("vagrant-hostsupdater")
-          @ui.warn "[vagrant-goodhosts] Warning: The vagrant-hostsupdater plugin is installed, hostsupdater always adds the VM name even if the VagrantFile says not to. This shouldn't cause issues, but if it does, uninstall hostsupdater"
-        end
-
         ips = []
+
+        if @machine.config.vm.networks.length == 0
+            @ui.error("[vagrant-goodhosts] No ip address found for this virtual machine")
+            exit
+        end
 
         @machine.config.vm.networks.each do |network|
           key, options = network[0], network[1]
           if options[:goodhosts] == "skip"
-            @ui.info '[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)'
+            @ui.info '[vagrant-goodhosts] Skipped adding host entries (config.vm.network goodhosts: "skip" is set)'
           end
           ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
           ips.push(ip) if ip
@@ -83,15 +84,20 @@ module VagrantPlugins
         return hostnames
       end
 
+      def disableClean(ip_address)
+        unless ip_address.nil?
+          return @machine.config.goodhosts.disable_clean
+        end
+        return true
+      end
+
       def addHostEntries
         error = false
         errorText = ""
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
 
-        if not hostnames_by_ips.any?
-          return
-        end
+        return if not hostnames_by_ips.any?
 
         @ui.info "[vagrant-goodhosts] Checking for host entries"
 
@@ -101,9 +107,17 @@ module VagrantPlugins
             next
           end
           if cli.include? ".exe"
-            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",\"--clean\",\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+            clean = "\"--clean\","
+            if disableClean(ip_address)
+                clean = ''
+            end
+            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
           else
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "add", "--clean", ip_address, hostnames)
+            clean = "--clean"
+            if disableClean(ip_address)
+                clean = ''
+            end
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
           end
           if !wait_thr.value.success?
             error = true
@@ -119,9 +133,7 @@ module VagrantPlugins
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
 
-        if not hostnames_by_ips.any?
-          return
-        end
+        return if not hostnames_by_ips.any?
 
         @ui.info "[vagrant-goodhosts] Removing hosts"
 
@@ -131,9 +143,17 @@ module VagrantPlugins
             next
           end
           if cli.include? ".exe"
-            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",\"--clean\",\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+            clean = "\"--clean\","
+            if disableClean(ip_address)
+                clean = ''
+            end
+            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
           else
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo", cli, "remove", "--clean", ip_address, hostnames)
+            clean = "\"--clean\","
+            if disableClean(ip_address)
+                clean = ''
+            end
+            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' remove #{clean} #{ip_address} #{hostnames}")
           end
           if !wait_thr.value.success?
             error = true
@@ -160,25 +180,33 @@ module VagrantPlugins
       def generateHostnamesByIps()
         hostnames_by_ips = []
         ips = getIps
+        if ips.count() < 1
+          @ui.error("[vagrant-goodhosts] No ip address found for this virtual machine")
+          return hostnames_by_ips
+        end
         hostnames = getHostnames(ips)
         if ips.count() > 1
           ips.each do |ip|
             ip_address = ip
-            hostnames[ip].each do |hostname|
+            if hostnames[ip].count() > 0
+              hostnames[ip].each do |hostname|
+                if !ip_address.nil?
+                  @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
+                end
+              end
+              hostnames_by_ips = { ip_address => hostnames[ip].join(" ") }
+            end
+          end
+        else
+          ip_address = ips[0]
+          if hostnames[ip_address].count() > 0
+            hostnames[ip_address].each do |hostname|
               if !ip_address.nil?
                 @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
               end
             end
-            hostnames_by_ips = { ip_address => hostnames[ip].join(" ") }
+            hostnames_by_ips = { ip_address => hostnames[ip_address].join(" ") }
           end
-        else
-          ip_address = ips[0]
-          hostnames[ip_address].each do |hostname|
-            if !ip_address.nil?
-              @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
-            end
-          end
-          hostnames_by_ips = { ip_address => hostnames[ip_address].join(" ") }
         end
 
         return hostnames_by_ips

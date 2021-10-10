@@ -1,19 +1,11 @@
-require_relative "../GoodHosts"
 module VagrantPlugins
   module GoodHosts
     module Action
-      class UpdateHosts
-        include GoodHosts
+      class UpdateHosts < BaseAction
 
-        def initialize(app, env)
-          @app = app
-          @machine = env[:machine]
-          @ui = env[:ui]
-        end
-
-        def call(env)
+        def run(env)
+          @ui.info "[vagrant-goodhosts] Checking for host entries"
           addHostEntries()
-          @app.call(env)
         end
 
       end
