@@ -12,7 +12,6 @@ module VagrantPlugins
         end
 
         def call(env)
-          @ui.info "[vagrant-goodhosts] Checking for host entries"
           addHostEntries()
           @app.call(env)
         end

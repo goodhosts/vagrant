@@ -13,11 +13,11 @@ module VagrantPlugins
 
         @machine.config.vm.networks.each do |network|
           key, options = network[0], network[1]
-          ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
-          ips.push(ip) if ip
           if options[:goodhosts] == "skip"
             @ui.info '[vagrant-goodhosts] Skipping adding host entries (config.vm.network goodhosts: "skip" is set)'
           end
+          ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
+          ips.push(ip) if ip
 
           @machine.config.vm.provider :hyperv do |v|
             timeout = @machine.provider_config.ip_address_timeout
@@ -36,7 +36,6 @@ module VagrantPlugins
             end
           end
 
-          
         end
         return ips
       end
@@ -44,16 +43,16 @@ module VagrantPlugins
       # https://stackoverflow.com/a/13586108/1902215
       def get_os_binary
         return os ||= (host_os = RbConfig::CONFIG["host_os"]
-                 case host_os
-               when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-                 :'cli.exe'
-               when /darwin|mac os/
-                 :'cli_osx'
-               when /linux/
-                 :'cli'
-               else
-                 raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
-               end)
+          case host_os
+          when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+            :'cli.exe'
+          when /darwin|mac os/
+            :'cli_osx'
+          when /linux/
+            :'cli'
+          else
+            raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
+          end)
       end
 
       def get_cli
@@ -94,6 +93,8 @@ module VagrantPlugins
           return
         end
 
+        @ui.info "[vagrant-goodhosts] Checking for host entries"
+
         hostnames_by_ips.each do |ip_address, hostnames|
           if ip_address.nil?
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
@@ -121,6 +122,8 @@ module VagrantPlugins
         if not hostnames_by_ips.any?
           return
         end
+
+        @ui.info "[vagrant-goodhosts] Removing hosts"
 
         hostnames_by_ips.each do |ip_address, hostnames|
           if ip_address.nil?
