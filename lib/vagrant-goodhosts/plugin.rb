@@ -19,6 +19,10 @@ module VagrantPlugins
         hook.append(Action::UpdateHosts)
       end
 
+      action_hook(:goodhosts, :machine_action_boot) do |hook|
+        hook.append(Action::UpdateHosts)
+      end
+
       action_hook(:goodhosts, :machine_action_provision) do |hook|
         hook.before(Vagrant::Action::Builtin::Provision, Action::UpdateHosts)
       end
