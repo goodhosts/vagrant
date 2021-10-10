@@ -8,8 +8,8 @@ module VagrantPlugins
         ips = []
 
         if @machine.config.vm.networks.length == 0
-            @ui.error("[vagrant-goodhosts] No ip address found for this virtual machine")
-            exit
+            @ui.error("[vagrant-goodhosts] No networks are available yet for this virtual machine to add IP/hosts for")
+            return ips
         end
 
         @machine.config.vm.networks.each do |network|
