@@ -12,7 +12,6 @@ module VagrantPlugins
           if ([:halt, :suspend].include? machine_action) && (false == @machine.config.goodhosts.remove_on_suspend)
             @ui.info "[vagrant-goodhosts] Removing hosts on suspend disabled"
           else
-            @ui.info "[vagrant-goodhosts] Removing hosts"
             removeHostEntries
           end
         end

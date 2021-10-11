@@ -1,5 +1,6 @@
 require "rbconfig"
 require "open3"
+require "resolv"
 
 module VagrantPlugins
   module GoodHosts
@@ -8,17 +9,17 @@ module VagrantPlugins
         ips = []
 
         if @machine.config.vm.networks.length == 0
-            @ui.error("[vagrant-goodhosts] No ip address found for this virtual machine")
-            exit
+            @ui.error("[vagrant-goodhosts] No networks are available yet for this virtual machine to add IP/hosts for")
+            return ips
         end
-        
+
         @machine.config.vm.networks.each do |network|
           key, options = network[0], network[1]
-          ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
-          ips.push(ip) if ip
           if options[:goodhosts] == "skip"
             @ui.info '[vagrant-goodhosts] Skipped adding host entries (config.vm.network goodhosts: "skip" is set)'
           end
+          ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
+          ips.push(ip) if ip
 
           @machine.config.vm.provider :hyperv do |v|
             timeout = @machine.provider_config.ip_address_timeout
@@ -37,7 +38,6 @@ module VagrantPlugins
             end
           end
 
-
         end
         return ips
       end
@@ -45,16 +45,16 @@ module VagrantPlugins
       # https://stackoverflow.com/a/13586108/1902215
       def get_os_binary
         return os ||= (host_os = RbConfig::CONFIG["host_os"]
-                 case host_os
-               when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-                 :'cli.exe'
-               when /darwin|mac os/
-                 :'cli_osx'
-               when /linux/
-                 :'cli'
-               else
-                 raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
-               end)
+          case host_os
+          when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+            :'cli.exe'
+          when /darwin|mac os/
+            :'cli_osx'
+          when /linux/
+            :'cli'
+          else
+            raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
+          end)
       end
 
       def get_cli
@@ -84,7 +84,7 @@ module VagrantPlugins
 
         return hostnames
       end
-      
+
       def disableClean(ip_address)
         unless ip_address.nil?
           return @machine.config.goodhosts.disable_clean
@@ -97,33 +97,62 @@ module VagrantPlugins
         errorText = ""
         cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
-        
+
         return if not hostnames_by_ips.any?
+
+        @ui.info "[vagrant-goodhosts] Checking for host entries"
 
         hostnames_by_ips.each do |ip_address, hostnames|
           if ip_address.nil?
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
           end
-          if cli.include? ".exe"
-            clean = "\"--clean\","
-            if disableClean(ip_address)
-                clean = ''
-            end
-            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
-          else
-            clean = "--clean"
-            if disableClean(ip_address)
-                clean = ''
-            end
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
-          end
+
+          # filter out the hosts we've already added
+          hosts_to_add = check_hostnames_to_add( ip_address, hostnames)
+          next if not hosts_to_add.any?
+
+          stdin, stdout, stderr, wait_thr = add_goodhost_entries(ip_address, hosts_to_add)
           if !wait_thr.value.success?
             error = true
             errorText = stderr.read.strip
           end
         end
         printReadme(error, errorText)
+      end
+
+      def check_hostnames_to_add(ip_address, hostnames)
+        hostnames_to_add = Array.new
+
+        # check which hostnames actually need adding
+        hostnames.each do |hostname|
+          begin
+            address = Resolv.getaddress(hostname)
+            if address != ip_address
+              hostnames_to_add.append( hostname )
+            end
+          rescue => exception
+            hostnames_to_add.append(hostname)
+          end
+        end
+        return hostnames_to_add
+      end
+
+      def add_goodhost_entries(ip_address, hostnames)
+        if cli.include? ".exe"
+          clean = "\"--clean\","
+          if disableClean(ip_address)
+              clean = ''
+          end
+          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+        else
+          clean = "--clean"
+          if disableClean(ip_address)
+              clean = ''
+          end
+          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
+        end
+        return stdin, stdout, stderr, wait_thr
       end
 
       def removeHostEntries
@@ -134,30 +163,38 @@ module VagrantPlugins
 
         return if not hostnames_by_ips.any?
 
+        @ui.info "[vagrant-goodhosts] Removing hosts"
+
         hostnames_by_ips.each do |ip_address, hostnames|
           if ip_address.nil?
             @ui.error "[vagrant-goodhosts] Error adding some hosts, no IP was provided for the following hostnames: #{hostnames}"
             next
           end
-          if cli.include? ".exe"
-            clean = "\"--clean\","
-            if disableClean(ip_address)
-                clean = ''
-            end
-            stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
-          else
-            clean = "\"--clean\","
-            if disableClean(ip_address)
-                clean = ''
-            end
-            stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' remove #{clean} #{ip_address} #{hostnames}")
-          end
+
+          stdin, stdout, stderr, wait_thr = remove_goodhost_entries(ip_address, hostnames)
           if !wait_thr.value.success?
             error = true
             errorText = stderr.read.strip
           end
         end
         printReadme(error, errorText)
+      end
+
+      def remove_goodhost_entries(ip_address, hostnames)
+        if cli.include? ".exe"
+          clean = "\"--clean\","
+          if disableClean(ip_address)
+              clean = ''
+          end
+          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+        else
+          clean = "\"--clean\","
+          if disableClean(ip_address)
+              clean = ''
+          end
+          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' remove #{clean} #{ip_address} #{hostnames}")
+        end
+        return stdin, stdout, stderr, wait_thr
       end
 
       def printReadme(error, errorText)

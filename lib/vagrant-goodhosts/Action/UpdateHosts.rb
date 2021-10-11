@@ -4,7 +4,6 @@ module VagrantPlugins
       class UpdateHosts < BaseAction
 
         def run(env)
-          @ui.info "[vagrant-goodhosts] Checking for host entries"
           addHostEntries()
         end
 
