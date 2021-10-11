@@ -13,3 +13,4 @@ rm -f ./*.txt
 # Generate
 cd ../../../
 gem build vagrant-goodhosts.gemspec
+# gem push
