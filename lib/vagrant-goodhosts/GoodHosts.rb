@@ -110,6 +110,7 @@ module VagrantPlugins
       end
 
       def addGoodhostEntries(ip_address, hostnames)
+        cli = get_cli
         if cli.include? ".exe"
           clean = "\"--clean\","
           if disableClean(ip_address)
@@ -129,7 +130,6 @@ module VagrantPlugins
       def addHostEntries
         error = false
         errorText = ""
-        cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
 
         return if not hostnames_by_ips.any?
@@ -156,6 +156,7 @@ module VagrantPlugins
       end
 
       def removeGoodhostEntries(ip_address, hostnames)
+        cli = get_cli
         if cli.include? ".exe"
           clean = "\"--clean\","
           if disableClean(ip_address)
@@ -175,7 +176,6 @@ module VagrantPlugins
       def removeHostEntries
         error = false
         errorText = ""
-        cli = get_cli
         hostnames_by_ips = generateHostnamesByIps
 
         return if not hostnames_by_ips.any?
