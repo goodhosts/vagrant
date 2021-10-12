@@ -92,6 +92,40 @@ module VagrantPlugins
         return true
       end
 
+      def checkHostnamesToAdd(ip_address, hostnames)
+        hostnames_to_add = Array.new
+        hostnames = hostnames.split
+        # check which hostnames actually need adding
+        hostnames.each do |hostname|
+          begin
+            address = Resolv.getaddress(hostname)
+            if address != ip_address
+              hostnames_to_add.append( hostname )
+            end
+          rescue => exception
+            hostnames_to_add.append(hostname)
+          end
+        end
+        return hostnames_to_add
+      end
+
+      def addGoodhostEntries(ip_address, hostnames)
+        if cli.include? ".exe"
+          clean = "\"--clean\","
+          if disableClean(ip_address)
+              clean = ''
+          end
+          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+        else
+          clean = "--clean"
+          if disableClean(ip_address)
+              clean = ''
+          end
+          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
+        end
+        return stdin, stdout, stderr, wait_thr
+      end
+
       def addHostEntries
         error = false
         errorText = ""
@@ -109,10 +143,10 @@ module VagrantPlugins
           end
 
           # filter out the hosts we've already added
-          hosts_to_add = check_hostnames_to_add( ip_address, hostnames)
+          hosts_to_add = checkHostnamesToAdd(ip_address, hostnames)
           next if not hosts_to_add.any?
 
-          stdin, stdout, stderr, wait_thr = add_goodhost_entries(ip_address, hosts_to_add)
+          stdin, stdout, stderr, wait_thr = addGoodhostEntries(ip_address, hosts_to_add)
           if !wait_thr.value.success?
             error = true
             errorText = stderr.read.strip
@@ -121,36 +155,19 @@ module VagrantPlugins
         printReadme(error, errorText)
       end
 
-      def check_hostnames_to_add(ip_address, hostnames)
-        hostnames_to_add = Array.new
-
-        # check which hostnames actually need adding
-        hostnames.each do |hostname|
-          begin
-            address = Resolv.getaddress(hostname)
-            if address != ip_address
-              hostnames_to_add.append( hostname )
-            end
-          rescue => exception
-            hostnames_to_add.append(hostname)
-          end
-        end
-        return hostnames_to_add
-      end
-
-      def add_goodhost_entries(ip_address, hostnames)
+      def removeGoodhostEntries(ip_address, hostnames)
         if cli.include? ".exe"
           clean = "\"--clean\","
           if disableClean(ip_address)
               clean = ''
           end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
         else
-          clean = "--clean"
+          clean = "\"--clean\","
           if disableClean(ip_address)
               clean = ''
           end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
+          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' remove #{clean} #{ip_address} #{hostnames}")
         end
         return stdin, stdout, stderr, wait_thr
       end
@@ -171,30 +188,13 @@ module VagrantPlugins
             next
           end
 
-          stdin, stdout, stderr, wait_thr = remove_goodhost_entries(ip_address, hostnames)
+          stdin, stdout, stderr, wait_thr = removeGoodhostEntries(ip_address, hostnames)
           if !wait_thr.value.success?
             error = true
             errorText = stderr.read.strip
           end
         end
         printReadme(error, errorText)
-      end
-
-      def remove_goodhost_entries(ip_address, hostnames)
-        if cli.include? ".exe"
-          clean = "\"--clean\","
-          if disableClean(ip_address)
-              clean = ''
-          end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
-        else
-          clean = "\"--clean\","
-          if disableClean(ip_address)
-              clean = ''
-          end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' remove #{clean} #{ip_address} #{hostnames}")
-        end
-        return stdin, stdout, stderr, wait_thr
       end
 
       def printReadme(error, errorText)
