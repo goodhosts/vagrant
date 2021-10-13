@@ -5,6 +5,7 @@ require_relative "Action/RemoveHosts"
 
 module VagrantPlugins
   module GoodHosts
+    # Various Vagrant hooks
     class Plugin < Vagrant.plugin('2')
       name 'GoodHosts'
       description <<-DESC

@@ -62,7 +62,7 @@ module VagrantPlugins
 
       def get_cli
         binary = get_os_binary
-        path = File.expand_path(File.dirname(File.dirname(__FILE__))) + "/vagrant-goodhosts/bundle/"
+        path = format('%s%s', File.expand_path(File.dirname(File.dirname(__FILE__))), "/vagrant-goodhosts/bundle/")
         path = "#{path}#{binary}"
 
         return path
@@ -119,13 +119,13 @@ module VagrantPlugins
           if disable_clean(ip_address)
             clean = ''
           end
-          _stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
         else
           clean = "--clean"
           if disable_clean(ip_address)
             clean = ''
           end
-          _stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
+          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
         end
         return _stdin, stdout, stderr, wait_thr
       end
@@ -149,8 +149,8 @@ module VagrantPlugins
           hosts_to_add = check_hostnames_to_add(ip_address, hostnames)
           next if hosts_to_add.none?
 
-          stdin, stdout, stderr, wait_thr = addGoodhostEntries(ip_address, hosts_to_add)
-          if !wait_thr.value.success?
+          _stdin, _stdout, stderr, wait_thr = addGoodhostEntries(ip_address, hosts_to_add)
+          unless wait_thr.value.success?
             error = true
             error_text = stderr.read.strip
           end
@@ -172,12 +172,12 @@ module VagrantPlugins
         return stdin, stdout, stderr, wait_thr
       end
 
-      def removeHostEntries
+      def remove_host_entries
         error = false
         error_text = ""
         hostnames_by_ips = generate_hostnames_by_ips
 
-        return if not hostnames_by_ips.any?
+        return if hostnames_by_ips.none?
 
         @ui.info "[vagrant-goodhosts] Removing hosts"
 
@@ -187,7 +187,7 @@ module VagrantPlugins
             next
           end
 
-          stdin, stdout, stderr, wait_thr = remove_goodhost_entries(ip_address, hostnames)
+          _stdin, _stdout, stderr, wait_thr = remove_goodhost_entries(ip_address, hostnames)
           if !wait_thr.value.success?
             error = true
             error_text = stderr.read.strip
@@ -210,7 +210,7 @@ module VagrantPlugins
         end
       end
 
-      def generate_hostnames_by_ips()
+      def generate_hostnames_by_ips
         hostnames_by_ips = []
         ips = get_ips
         if ips.count() < 1

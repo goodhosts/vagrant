@@ -5,7 +5,7 @@ module VagrantPlugins
       # Update hosts
       class UpdateHosts < BaseAction
         def run(_env)
-          addHostEntries()
+          add_host_entries()
         end
       end
     end
