@@ -2,7 +2,7 @@
 require "vagrant-goodhosts/version"
 require "vagrant-goodhosts/plugin"
 
-#Extend Vagrant Plugins
+# Extend Vagrant Plugins
 module VagrantPlugins
   # Load our plugin
   module GoodHosts

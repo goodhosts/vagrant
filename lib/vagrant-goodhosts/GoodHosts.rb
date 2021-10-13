@@ -7,12 +7,12 @@ module VagrantPlugins
   module GoodHosts
     # Plugin module
     module GoodHosts
-      def getIps
+      def get_ips
         ips = []
 
-        if @machine.config.vm.networks.length == 0
-            @ui.error("[vagrant-goodhosts] No networks are available yet for this virtual machine to add IP/hosts for")
-            return ips
+        if @machine.config.vm.networks.empty?
+          @ui.error("[vagrant-goodhosts] No networks are available yet for this virtual machine to add IP/hosts for")
+          return ips
         end
 
         @machine.config.vm.networks.each do |network|
@@ -39,7 +39,6 @@ module VagrantPlugins
               ips.push(network["ip"]) unless ips.include? network["ip"]
             end
           end
-
         end
         return ips
       end
@@ -102,9 +101,9 @@ module VagrantPlugins
           begin
             address = Resolv.getaddress(hostname)
             if address != ip_address
-              hostnames_to_add.append( hostname )
+              hostnames_to_add.append(hostname)
             end
-          rescue => exception
+          rescue => e
             hostnames_to_add.append(hostname)
           end
         end
@@ -122,7 +121,7 @@ module VagrantPlugins
         else
           clean = "--clean"
           if disableClean(ip_address)
-              clean = ''
+            clean = ''
           end
           stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
         end
@@ -131,10 +130,10 @@ module VagrantPlugins
 
       def addHostEntries
         error = false
-        errorText = ""
+        error_text = ""
         hostnames_by_ips = generateHostnamesByIps
 
-        return if not hostnames_by_ips.any?
+        return if hostnames_by_ips.none?
 
         @ui.info "[vagrant-goodhosts] Checking for host entries"
 
@@ -146,15 +145,15 @@ module VagrantPlugins
 
           # filter out the hosts we've already added
           hosts_to_add = checkHostnamesToAdd(ip_address, hostnames)
-          next if not hosts_to_add.any?
+          next if hosts_to_add.none?
 
           stdin, stdout, stderr, wait_thr = addGoodhostEntries(ip_address, hosts_to_add)
           if !wait_thr.value.success?
             error = true
-            errorText = stderr.read.strip
+            error_text = stderr.read.strip
           end
         end
-        printReadme(error, errorText)
+        printReadme(error, error_text)
       end
 
       def removeGoodhostEntries(ip_address, hostnames)
@@ -177,7 +176,7 @@ module VagrantPlugins
 
       def removeHostEntries
         error = false
-        errorText = ""
+        error_text = ""
         hostnames_by_ips = generateHostnamesByIps
 
         return if not hostnames_by_ips.any?
@@ -193,16 +192,16 @@ module VagrantPlugins
           stdin, stdout, stderr, wait_thr = removeGoodhostEntries(ip_address, hostnames)
           if !wait_thr.value.success?
             error = true
-            errorText = stderr.read.strip
+            error_text = stderr.read.strip
           end
         end
-        printReadme(error, errorText)
+        printReadme(error, error_text)
       end
 
-      def printReadme(error, errorText)
+      def printReadme(error, error_text)
         if error
           cli = get_cli
-          @ui.error "[vagrant-goodhosts] Issue executing goodhosts CLI: #{errorText}"
+          @ui.error "[vagrant-goodhosts] Issue executing goodhosts CLI: #{error_text}"
           @ui.error "[vagrant-goodhosts] Cli path: #{cli}"
           if cli.include? ".exe"
             @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#windows-uac-prompt"
@@ -215,7 +214,7 @@ module VagrantPlugins
 
       def generateHostnamesByIps()
         hostnames_by_ips = []
-        ips = getIps
+        ips = get_ips
         if ips.count() < 1
           @ui.error("[vagrant-goodhosts] No ip address found for this virtual machine")
           return hostnames_by_ips

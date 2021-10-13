@@ -31,3 +31,17 @@ Layout/LineLength:
     Enabled: false
 Style/RedundantReturn:
     Enabled: false
+Style/SymbolArray:
+    Enabled: false
+Metrics/AbcSize:
+    Enabled: false
+Style/NumericPredicate:
+    Enabled: false
+Style/ParallelAssignment:
+    Enabled: false
+Naming/AccessorMethodName:
+    Enabled: false
+Style/Not:
+    Enabled: false
+Style/EmptyLiteral:
+    Enabled: false
