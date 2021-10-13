@@ -104,7 +104,7 @@ module VagrantPlugins
         rescue StandardError => _e
           hostnames_to_add.append(hostname)
         end
-        return hostnames_to_add
+        return hostnames_to_add.join(' ')
       end
 
       def add_goodhost_entries(ip_address, hostnames)
@@ -139,7 +139,7 @@ module VagrantPlugins
 
           # filter out the hosts we've already added
           hosts_to_add = check_hostnames_to_add(ip_address, hostnames)
-          next if hosts_to_add.none?
+          next if hosts_to_add.empty?
 
           _stdin, _stdout, stderr, wait_thr, command = add_goodhost_entries(ip_address, hosts_to_add)
           unless wait_thr.value.success?
