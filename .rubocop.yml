@@ -2,7 +2,7 @@ AllCops:
   Exclude:
     - 'Gemfile'
     - 'Rakefile'
-    - 'config.rb'
+    - 'lib/vagrant-goodhosts/config.rb'
 
 Style/StringLiterals:
     Enabled: false
@@ -55,4 +55,10 @@ Style/SymbolLiteral:
 Gemspec/RequiredRubyVersion:
     Enabled: false
 Style/AccessorGrouping:
+    Enabled: false
+Style/Next:
+    Enabled: false
+Style/MultipleComparison:
+    Enabled: false
+Style/FormatStringToken:
     Enabled: false

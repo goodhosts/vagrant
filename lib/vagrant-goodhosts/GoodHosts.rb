@@ -100,19 +100,17 @@ module VagrantPlugins
         hostnames = hostnames.split
         # check which hostnames actually need adding
         hostnames.each do |hostname|
-          begin
             address = Resolv.getaddress(hostname)
             if address != ip_address
               hostnames_to_add.append(hostname)
             end
-          rescue
+          rescue StandardError => e
             hostnames_to_add.append(hostname)
-          end
         end
         return hostnames_to_add
       end
 
-      def addGoodhostEntries(ip_address, hostnames)
+      def add_goodhost_entries(ip_address, hostnames)
         cli = get_cli
         if cli.include? ".exe"
           clean = "\"--clean\","
@@ -149,7 +147,7 @@ module VagrantPlugins
           hosts_to_add = check_hostnames_to_add(ip_address, hostnames)
           next if hosts_to_add.none?
 
-          _stdin, _stdout, stderr, wait_thr = addGoodhostEntries(ip_address, hosts_to_add)
+          _stdin, _stdout, stderr, wait_thr = add_goodhost_entries(ip_address, hosts_to_add)
           unless wait_thr.value.success?
             error = true
             error_text = stderr.read.strip
@@ -188,7 +186,7 @@ module VagrantPlugins
           end
 
           _stdin, _stdout, stderr, wait_thr = remove_goodhost_entries(ip_address, hostnames)
-          if !wait_thr.value.success?
+          unless wait_thr.value.success?
             error = true
             error_text = stderr.read.strip
           end
@@ -197,16 +195,17 @@ module VagrantPlugins
       end
 
       def print_readme(error, error_text)
-        if error
-          cli = get_cli
-          @ui.error "[vagrant-goodhosts] Issue executing goodhosts CLI: #{error_text}"
-          @ui.error "[vagrant-goodhosts] Cli path: #{cli}"
-          if cli.include? ".exe"
-            @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#windows-uac-prompt"
-            exit
-          else
-            @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#passwordless-sudo"
-          end
+        if !error
+          return false
+        end
+        cli = get_cli
+        @ui.error "[vagrant-goodhosts] Issue executing goodhosts CLI: #{error_text}"
+        @ui.error "[vagrant-goodhosts] Cli path: #{cli}"
+        if cli.include? ".exe"
+          @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#windows-uac-prompt"
+          exit
+        else
+          @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#passwordless-sudo"
         end
       end
 
