@@ -155,13 +155,17 @@ module VagrantPlugins
 
       def remove_goodhost_entries(ip_address, hostnames)
         cli = get_cli
-        clean = "\"--clean\","
-        if disable_clean(ip_address)
-          clean = ''
-        end
         if cli.include? ".exe"
+          clean = "\"--clean\","
+          if disable_clean(ip_address)
+            clean = ''
+          end
           stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
         else
+          clean = "--clean"
+          if disable_clean(ip_address)
+            clean = ''
+          end
           stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' remove #{clean} #{ip_address} #{hostnames}")
         end
         return stdin, stdout, stderr, wait_thr
