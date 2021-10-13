@@ -45,3 +45,11 @@ Style/Not:
     Enabled: false
 Style/EmptyLiteral:
     Enabled: false
+Style/IfUnlessModifier:
+    Enabled: false
+Style/MutableConstant:
+    Enabled: false
+Style/SymbolLiteral:
+    Enabled: false
+Gemspec/RequiredRubyVersion:
+    Enabled: false

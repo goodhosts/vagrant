@@ -1,4 +1,3 @@
-# coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'vagrant-goodhosts/version'
@@ -14,7 +13,7 @@ Gem::Specification.new do |s|
   s.homepage      = 'https://github.com/goodhosts/vagrant'
   s.license       = 'MIT'
 
-  s.files         = `git ls-files`.split($/)
+  s.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   s.files        += Dir.glob("lib/vagrant-goodhosts/bundle/*")
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
