@@ -2,6 +2,7 @@
 require "rbconfig"
 require "open3"
 require "resolv"
+require "os"
 
 module VagrantPlugins
   module GoodHosts
@@ -43,20 +44,15 @@ module VagrantPlugins
         return ips
       end
 
-      # https://stackoverflow.com/a/13586108/1902215
       def get_os_binary
-        return @os ||= begin
-          host_os = RbConfig::CONFIG["host_os"]
-          case host_os
-          when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
-            :'cli.exe'
-          when /darwin|mac os/
-            :'cli_osx'
-          when /linux/
-            :'cli'
-          else
-            raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
-          end
+        if OS.windows?
+          return 'cli.exe'
+        elseif OS.mac?
+          return 'cli_osx'
+        elseif OS.linux?
+          return 'cli'
+        else
+          raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
         end
       end
 
@@ -118,15 +114,15 @@ module VagrantPlugins
           if disable_clean(ip_address)
             clean = ''
           end
-          _stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
         else
           clean = "--clean"
           if disable_clean(ip_address)
             clean = ''
           end
-          _stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
+          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
         end
-        return _stdin, stdout, stderr, wait_thr
+        return stdin, stdout, stderr, wait_thr
       end
 
       def add_host_entries

@@ -7,3 +7,5 @@ end
 group :plugins do
   gem "vagrant-goodhosts", path: "."
 end
+
+gem 'os'
