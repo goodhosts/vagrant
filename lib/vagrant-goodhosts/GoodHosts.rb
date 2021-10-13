@@ -47,9 +47,9 @@ module VagrantPlugins
       def get_os_binary
         if OS.windows?
           return 'cli.exe'
-        else if OS.mac?
+        elsif OS.mac?
           return 'cli_osx'
-        else if OS.linux?
+        elsif OS.linux?
           return 'cli'
         else
           raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
