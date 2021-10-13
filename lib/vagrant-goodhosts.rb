@@ -1,6 +1,7 @@
 require "vagrant-goodhosts/version"
 require "vagrant-goodhosts/plugin"
 
+# Load the plugin
 module VagrantPlugins
   module GoodHosts
     def self.source_root
@@ -8,4 +9,3 @@ module VagrantPlugins
     end
   end
 end
-

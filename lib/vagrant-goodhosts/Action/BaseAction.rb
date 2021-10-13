@@ -1,3 +1,4 @@
+# Action to extend for the plugin needs, detects if it was already executed etc
 module VagrantPlugins
   module GoodHosts
     module Action
@@ -38,7 +39,6 @@ module VagrantPlugins
         def run(env)
           raise NotImplementedError.new("Must be implemented!")
         end
-
       end
     end
   end

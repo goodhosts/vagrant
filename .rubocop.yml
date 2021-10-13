@@ -1,0 +1,28 @@
+AllCops:
+  Exclude:
+    - 'Gemfile'
+    - 'Rakefile'
+
+Style/StringLiterals:
+    Enabled: false
+
+Style/ExpandPathArguments:
+    Enabled: false
+
+Naming/FileName:
+    Enabled: false
+
+Style/ClassVars:
+    Enabled: false
+
+Style/YodaCondition:
+    Enabled: false
+
+Style/MethodCallWithoutArgsParentheses:
+    Enabled: false
+
+Metrics/ModuleLength:
+    Enabled: false
+
+Metrics/CyclomaticComplexity:
+    Enabled: false

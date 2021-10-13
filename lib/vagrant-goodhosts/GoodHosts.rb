@@ -1,3 +1,4 @@
+# The core of the plugin
 require "rbconfig"
 require "open3"
 require "resolv"

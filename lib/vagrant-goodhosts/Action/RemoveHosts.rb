@@ -1,8 +1,8 @@
+# Run when is removing the hosts
 module VagrantPlugins
   module GoodHosts
     module Action
       class RemoveHosts < BaseAction
-
         def run(env)
           machine_action = env[:machine_action]
 
@@ -15,7 +15,6 @@ module VagrantPlugins
             removeHostEntries
           end
         end
-
       end
     end
   end
