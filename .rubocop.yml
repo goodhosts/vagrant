@@ -62,3 +62,5 @@ Style/MultipleComparison:
     Enabled: false
 Style/FormatStringToken:
     Enabled: false
+Style/SoleNestedConditional:
+    Enabled: false

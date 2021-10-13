@@ -45,7 +45,7 @@ module VagrantPlugins
 
       # https://stackoverflow.com/a/13586108/1902215
       def get_os_binary
-        return os ||= begin
+        return @os ||= begin
           host_os = RbConfig::CONFIG["host_os"]
           case host_os
           when /mswin|msys|mingw|cygwin|bccwin|wince|emc/
@@ -92,6 +92,7 @@ module VagrantPlugins
         unless ip_address.nil?
           return @machine.config.goodhosts.disable_clean
         end
+
         return true
       end
 
@@ -100,12 +101,12 @@ module VagrantPlugins
         hostnames = hostnames.split
         # check which hostnames actually need adding
         hostnames.each do |hostname|
-            address = Resolv.getaddress(hostname)
-            if address != ip_address
-              hostnames_to_add.append(hostname)
-            end
-          rescue StandardError => e
+          address = Resolv.getaddress(hostname)
+          if address != ip_address
             hostnames_to_add.append(hostname)
+          end
+        rescue StandardError => _e
+          hostnames_to_add.append(hostname)
         end
         return hostnames_to_add
       end
@@ -117,13 +118,13 @@ module VagrantPlugins
           if disable_clean(ip_address)
             clean = ''
           end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+          _stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
         else
           clean = "--clean"
           if disable_clean(ip_address)
             clean = ''
           end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
+          _stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
         end
         return _stdin, stdout, stderr, wait_thr
       end
@@ -195,9 +196,10 @@ module VagrantPlugins
       end
 
       def print_readme(error, error_text)
-        if !error
+        unless error
           return false
         end
+
         cli = get_cli
         @ui.error "[vagrant-goodhosts] Issue executing goodhosts CLI: #{error_text}"
         @ui.error "[vagrant-goodhosts] Cli path: #{cli}"
