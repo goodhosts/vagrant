@@ -110,11 +110,11 @@ module VagrantPlugins
       def add_goodhost_entries(ip_address, hostnames)
         cli = get_cli
         if cli.include? ".exe"
-          clean = get_clean_parameter_by_system(True)
+          clean = get_clean_parameter_by_system(ip_address, true)
           command = "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs"
           stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", command)
         else
-          clean = get_clean_parameter_by_system(False)
+          clean = get_clean_parameter_by_system(ip_address, false)
           command = "sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}"
           stdin, stdout, stderr, wait_thr = Open3.popen3(command)
         end
@@ -123,7 +123,8 @@ module VagrantPlugins
 
       def add_host_entries
         error = false
-        error_text = ""
+        error_text = ''
+        command = ''
         hostnames_by_ips = generate_hostnames_by_ips
 
         return if hostnames_by_ips.none?
@@ -152,11 +153,11 @@ module VagrantPlugins
       def remove_goodhost_entries(ip_address, hostnames)
         cli = get_cli
         if cli.include? ".exe"
-          clean = get_clean_parameter_by_system(True)
+          clean = get_clean_parameter_by_system(ip_address, true)
           command = "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs"
           stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", command)
         else
-          clean = get_clean_parameter_by_system(False)
+          clean = get_clean_parameter_by_system(ip_address, false)
           command = "sudo '#{cli}' remove #{clean} #{ip_address} #{hostnames}"
           stdin, stdout, stderr, wait_thr = Open3.popen3(command)
         end
@@ -165,7 +166,8 @@ module VagrantPlugins
 
       def remove_host_entries
         error = false
-        error_text = ""
+        error_text = ''
+        command = ''
         hostnames_by_ips = generate_hostnames_by_ips
 
         return if hostnames_by_ips.none?
@@ -187,7 +189,7 @@ module VagrantPlugins
         print_readme(error, error_text, command)
       end
 
-      def get_clean_parameter_by_system(is_win)
+      def get_clean_parameter_by_system(ip_address, is_win)
         clean = "--clean"
         if is_win
           clean = "\"--clean\","
@@ -199,7 +201,7 @@ module VagrantPlugins
         return clean
       end
 
-      def print_readme(error, error_text)
+      def print_readme(error, error_text, command)
         unless error
           return false
         end
@@ -216,6 +218,18 @@ module VagrantPlugins
         end
       end
 
+      def append_hostsnames_by_ips(hostnames_by_ips, hostnames, ip_address, ip_index)
+        if hostnames[ip_index].count() > 0
+          hostnames[ip_index].each do |hostname|
+            unless ip_address.nil?
+              @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
+            end
+          end
+          hostnames_by_ips = { ip_address => hostnames[ip_index].join(" ") }
+        end
+        return hostnames_by_ips
+      end
+
       def generate_hostnames_by_ips
         hostnames_by_ips = []
         ips = get_ips
@@ -227,25 +241,11 @@ module VagrantPlugins
         if ips.count() > 1
           ips.each do |ip|
             ip_address = ip
-            if hostnames[ip].count() > 0
-              hostnames[ip].each do |hostname|
-                unless ip_address.nil?
-                  @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
-                end
-              end
-              hostnames_by_ips = { ip_address => hostnames[ip].join(" ") }
-            end
+            hostnames_by_ips = append_hostsnames_by_ips(hostnames_by_ips, hostnames, ip_address, ip)
           end
         else
           ip_address = ips[0]
-          if hostnames[ip_address].count() > 0
-            hostnames[ip_address].each do |hostname|
-              unless ip_address.nil?
-                @ui.info "[vagrant-goodhosts] - found entry for: #{ip_address} #{hostname}"
-              end
-            end
-            hostnames_by_ips = { ip_address => hostnames[ip_address].join(" ") }
-          end
+          hostnames_by_ips = append_hostsnames_by_ips(hostnames_by_ips, hostnames, ip_address, ip_address)
         end
 
         return hostnames_by_ips
