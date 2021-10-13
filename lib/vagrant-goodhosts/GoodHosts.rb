@@ -5,6 +5,7 @@ require "resolv"
 
 module VagrantPlugins
   module GoodHosts
+    # Plugin module
     module GoodHosts
       def getIps
         ips = []
@@ -22,7 +23,7 @@ module VagrantPlugins
           ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
           ips.push(ip) if ip
 
-          @machine.config.vm.provider :hyperv do |v|
+          @machine.config.vm.provider :hyperv do
             timeout = @machine.provider_config.ip_address_timeout
             @ui.output("[vagrant-goodhosts] Waiting for the guest machine to report its IP address ( this might take some time, have patience )...")
             @ui.detail("Timeout: #{timeout} seconds")
@@ -31,7 +32,7 @@ module VagrantPlugins
               vmm_server_address: @machine.provider_config.vmm_server_address,
               proxy_server_address: @machine.provider_config.proxy_server_address,
               timeout: timeout,
-              machine: @machine,
+              machine: @machine
             }
             network = @machine.provider.driver.read_guest_ip(options)
             if network["ip"]

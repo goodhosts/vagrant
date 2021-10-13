@@ -2,6 +2,7 @@
 module VagrantPlugins
   module GoodHosts
     module Action
+      # Extend it!
       class BaseAction
         include GoodHosts
 
@@ -36,7 +37,7 @@ module VagrantPlugins
           @app.call(env)
         end
 
-        def run(env)
+        def run(_env)
           raise NotImplementedError.new("Must be implemented!")
         end
       end
