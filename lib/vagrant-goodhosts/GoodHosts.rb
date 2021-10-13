@@ -110,19 +110,15 @@ module VagrantPlugins
       def add_goodhost_entries(ip_address, hostnames)
         cli = get_cli
         if cli.include? ".exe"
-          clean = "\"--clean\","
-          if disable_clean(ip_address)
-            clean = ''
-          end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+          clean = get_clean_parameter_by_system(True)
+          command = "Start-Process '#{cli}' -ArgumentList \"add\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs"
+          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", command)
         else
-          clean = "--clean"
-          if disable_clean(ip_address)
-            clean = ''
-          end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}")
+          clean = get_clean_parameter_by_system(False)
+          command = "sudo '#{cli}' add #{clean} #{ip_address} #{hostnames}"
+          stdin, stdout, stderr, wait_thr = Open3.popen3(command)
         end
-        return stdin, stdout, stderr, wait_thr
+        return stdin, stdout, stderr, wait_thr, command
       end
 
       def add_host_entries
@@ -144,31 +140,27 @@ module VagrantPlugins
           hosts_to_add = check_hostnames_to_add(ip_address, hostnames)
           next if hosts_to_add.none?
 
-          _stdin, _stdout, stderr, wait_thr = add_goodhost_entries(ip_address, hosts_to_add)
+          _stdin, _stdout, stderr, wait_thr, command = add_goodhost_entries(ip_address, hosts_to_add)
           unless wait_thr.value.success?
             error = true
             error_text = stderr.read.strip
           end
         end
-        print_readme(error, error_text)
+        print_readme(error, error_text, command)
       end
 
       def remove_goodhost_entries(ip_address, hostnames)
         cli = get_cli
         if cli.include? ".exe"
-          clean = "\"--clean\","
-          if disable_clean(ip_address)
-            clean = ''
-          end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs")
+          clean = get_clean_parameter_by_system(True)
+          command = "Start-Process '#{cli}' -ArgumentList \"remove\",#{clean}\"#{ip_address}\",\"#{hostnames}\" -Verb RunAs"
+          stdin, stdout, stderr, wait_thr = Open3.popen3("powershell", "-Command", command)
         else
-          clean = "--clean"
-          if disable_clean(ip_address)
-            clean = ''
-          end
-          stdin, stdout, stderr, wait_thr = Open3.popen3("sudo '#{cli}' remove #{clean} #{ip_address} #{hostnames}")
+          clean = get_clean_parameter_by_system(False)
+          command = "sudo '#{cli}' remove #{clean} #{ip_address} #{hostnames}"
+          stdin, stdout, stderr, wait_thr = Open3.popen3(command)
         end
-        return stdin, stdout, stderr, wait_thr
+        return stdin, stdout, stderr, wait_thr, command
       end
 
       def remove_host_entries
@@ -186,13 +178,25 @@ module VagrantPlugins
             next
           end
 
-          _stdin, _stdout, stderr, wait_thr = remove_goodhost_entries(ip_address, hostnames)
+          _stdin, _stdout, stderr, wait_thr, command = remove_goodhost_entries(ip_address, hostnames)
           unless wait_thr.value.success?
             error = true
             error_text = stderr.read.strip
           end
         end
-        print_readme(error, error_text)
+        print_readme(error, error_text, command)
+      end
+
+      def get_clean_parameter_by_system(is_win)
+        clean = "--clean"
+        if is_win
+          clean = "\"--clean\","
+        end
+
+        if disable_clean(ip_address)
+          clean = ''
+        end
+        return clean
       end
 
       def print_readme(error, error_text)
@@ -202,6 +206,7 @@ module VagrantPlugins
 
         cli = get_cli
         @ui.error "[vagrant-goodhosts] Issue executing goodhosts CLI: #{error_text}"
+        @ui.error "[vagrant-goodhosts] Command: #{command}"
         @ui.error "[vagrant-goodhosts] Cli path: #{cli}"
         if cli.include? ".exe"
           @ui.error "[vagrant-goodhosts] Check the readme at https://github.com/goodhosts/vagrant#windows-uac-prompt"
