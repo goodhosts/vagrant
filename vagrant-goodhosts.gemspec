@@ -6,6 +6,7 @@ Gem::Specification.new do |s|
   s.name          = 'vagrant-goodhosts'
   s.version       = VagrantPlugins::GoodHosts::VERSION
   s.platform      = Gem::Platform::RUBY
+  s.required_ruby_version = '>= 2.5'
   s.authors       = ['Daniele Scasciafratte']
   s.email         = ['mte90net@gmail.com']
   s.description   = "Enables Vagrant to update hosts file on the host machine with goodhosts"
