@@ -19,10 +19,12 @@ module VagrantPlugins
       end
 
       action_hook(:goodhosts, :machine_action_up) do |hook|
+        hook.prepend(Action::RemoveHosts)
         hook.append(Action::UpdateHosts)
       end
 
       action_hook(:goodhosts, :machine_action_boot) do |hook|
+        hook.prepend(Action::RemoveHosts)
         hook.append(Action::UpdateHosts)
       end
 
