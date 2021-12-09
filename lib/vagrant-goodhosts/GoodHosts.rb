@@ -208,6 +208,7 @@ module VagrantPlugins
 
       def print_readme(error, error_text, command)
         unless error
+          @ui.info "[vagrant-goodhosts] Finished processing"
           return false
         end
 
