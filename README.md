@@ -24,6 +24,13 @@ To update the plugin:
 vagrant plugin update vagrant-goodhosts
 ```
 
+### Installation from Gem file
+
+The gem file is released with every [release](https://github.com/goodhosts/vagrant/releases) and you can install it with vagrant as it is a plugin after all.  
+Affter downloading the file run this command to install manually:
+
+`vagrant plugin install vagrant-goodhosts-*.gem`
+
 ## Usage
 
 You currently only need the `hostname` and a `:private_network` network with a fixed IP address.
@@ -115,7 +122,7 @@ You have to open an elevated command prompt; hold `❖ Win` and press `X`, then 
 
     cacls %SYSTEMROOT%\system32\drivers\etc\hosts /E /G %USERNAME%:W
 
-## Installing The Development Version
+## Generate The Development Version
 
 If you would like to install `vagrant-goodhosts` to make contributions or changes, run the following commands::
 
@@ -125,3 +132,7 @@ cd vagrant-goodhosts
 ./package.sh
 vagrant plugin install vagrant-goodhosts-*.gem
 ```
+
+## Test the plugin
+
+You need to run a Vagrant machine with the minimum settings specified in the [Usage](https://github.com/goodhosts/vagrant#usage) section, it is enough a turn on and off and in the meantime if the hosts file in your machine is written in the right way.
