@@ -48,11 +48,10 @@ module VagrantPlugins
         if OS.windows?
           return 'cli.exe'
         elsif OS.mac?
-          type = system('uname -m')
-          if type == 'x86_64'
-            return 'cli_amd64_osx'
-          else
+          if Etc.uname[:version].include? 'ARM64'
             return 'cli_arm64_osx'
+          else
+            return 'cli_amd64_osx'
           end
         elsif OS.linux?
           return 'cli'
