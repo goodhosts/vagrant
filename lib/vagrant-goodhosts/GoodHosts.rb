@@ -100,11 +100,12 @@ module VagrantPlugins
         hostnames_to_add = Array.new
         hostnames = hostnames.split
         # check which hostnames actually need adding
-        hostnames.each do |hostname|
-          address = Resolv.getaddress(hostname)
-          if address != ip_address
-            hostnames_to_add.append(hostname)
-          end
+        begin
+          hostnames.each do |hostname|
+            address = Resolv.getaddress(hostname)
+            if address != ip_address
+              hostnames_to_add.append(hostname)
+            end
         rescue StandardError => _e
           hostnames_to_add.append(hostname)
         end
