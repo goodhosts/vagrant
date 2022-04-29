@@ -106,6 +106,7 @@ module VagrantPlugins
             if address != ip_address
               hostnames_to_add.append(hostname)
             end
+          end
         rescue StandardError => _e
           hostnames_to_add.append(hostname)
         end
