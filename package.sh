@@ -7,7 +7,8 @@ curl -s https://api.github.com/repos/goodhosts/cli/releases/latest | jq --raw-ou
 # Extract
 tar -zxvf goodhosts-1.1.0-darwin-amd64.tar.gz goodhosts && mv goodhosts cli_amd64_osx
 tar -zxvf goodhosts-1.1.0-darwin-arm64.tar.gz goodhosts && mv goodhosts cli_arm64_osx
-tar -zxvf goodhosts-1.1.0-linux-amd64.tar.gz goodhosts && mv goodhosts cli
+tar -zxvf goodhosts-1.1.0-linux-amd64.tar.gz goodhosts && mv goodhosts cli_amd64_linux
+tar -zxvf goodhosts-1.1.0-linux-arm64.tar.gz goodhosts && mv goodhosts cli_arm64_linux
 tar -zxvf goodhosts-1.1.0-windows-amd64.tar.gz goodhosts.exe && mv goodhosts.exe cli.exe
 rm -f ./*.tar.gz
 rm -f ./*.txt

@@ -54,7 +54,11 @@ module VagrantPlugins
             return 'cli_amd64_osx'
           end
         elsif OS.linux?
-          return 'cli'
+          if Etc.uname[:version].include? 'ARM64'
+            return 'cli_arm64_linux'
+          else
+            return 'cli_amd64_linux'
+          end
         else
           raise Error::WebDriverError, "unknown os: #{host_os.inspect}"
         end
