@@ -31,15 +31,15 @@ module VagrantPlugins
       end
 
       action_hook(:goodhosts, :machine_action_halt) do |hook|
-        hook.append(Action::RemoveHosts)
+        hook.prepend(Action::RemoveHosts)
       end
 
       action_hook(:goodhosts, :machine_action_suspend) do |hook|
-        hook.append(Action::RemoveHosts)
+        hook.prepend(Action::RemoveHosts)
       end
 
       action_hook(:goodhosts, :machine_action_destroy) do |hook|
-        hook.append(Action::RemoveHosts)
+        hook.prepend(Action::RemoveHosts)
       end
 
       action_hook(:goodhosts, :machine_action_reload) do |hook|
