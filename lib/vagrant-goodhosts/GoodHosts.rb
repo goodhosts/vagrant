@@ -10,12 +10,6 @@ module VagrantPlugins
     module GoodHosts
       def get_ips
         ips = []
-
-        if @machine.config.vm.networks.empty?
-          @ui.error("[vagrant-goodhosts] No networks are available yet for this virtual machine to add IP/hosts for")
-          return ips
-        end
-
         @machine.config.vm.networks.each do |network|
           key, options = network[0], network[1]
           if options[:goodhosts] == "skip"
@@ -23,23 +17,11 @@ module VagrantPlugins
           end
           ip = options[:ip] if (key == :private_network || key == :public_network) && options[:goodhosts] != "skip"
           ips.push(ip) if ip
-
-          @machine.config.vm.provider :hyperv do
-            timeout = @machine.provider_config.ip_address_timeout
-            @ui.output("[vagrant-goodhosts] Waiting for the guest machine to report its IP address ( this might take some time, have patience )...")
-            @ui.detail("Timeout: #{timeout} seconds")
-
-            options = {
-              vmm_server_address: @machine.provider_config.vmm_server_address,
-              proxy_server_address: @machine.provider_config.proxy_server_address,
-              timeout: timeout,
-              machine: @machine
-            }
-            network = @machine.provider.driver.read_guest_ip(options)
-            if network["ip"]
-              ips.push(network["ip"]) unless ips.include? network["ip"]
-            end
-          end
+        end
+        if @machine.provider_name == :hyperv
+          ip = @machine.provider.driver.read_guest_ip["ip"]
+          @ui.info "[vagrant-goodhosts] Read guest IP #{ip} from Hyper-V provider"
+          ips.push(ip) unless ip.nil? or ips.include? ip
         end
         return ips
       end
