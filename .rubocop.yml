@@ -19,6 +19,8 @@ Metrics/CyclomaticComplexity:
     Enabled: false
 Metrics/AbcSize:
     Enabled: false
+Style/AndOr
+    Enabled: false
 Style/FrozenStringLiteralComment:
     Enabled: false
 Style/RaiseArgs:
