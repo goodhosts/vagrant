@@ -13,9 +13,9 @@ module VagrantPlugins
         if @machine.provider_name == :docker
           @ui.info '[vagrant-goodhosts] Docker detected, adding 127.0.0.1 and ::1 IP addresses'
           ip = "127.0.0.1"
-          ips.push(ip) unless ip.nil? or ips.include? ip
+          ips.push(ip) unless ip.nil? || ips.include? ip
           ip = "::1"
-          ips.push(ip) unless ip.nil? or ips.include? ip
+          ips.push(ip) unless ip.nil? || ips.include? ip
           return ips
         end
         @machine.config.vm.networks.each do |network|
@@ -29,7 +29,7 @@ module VagrantPlugins
         if @machine.provider_name == :hyperv
           ip = @machine.provider.driver.read_guest_ip["ip"]
           @ui.info "[vagrant-goodhosts] Read guest IP #{ip} from Hyper-V provider"
-          ips.push(ip) unless ip.nil? or ips.include? ip
+          ips.push(ip) unless ip.nil? || ips.include? ip
         end
         return ips
       end
