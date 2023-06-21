@@ -10,6 +10,14 @@ module VagrantPlugins
     module GoodHosts
       def get_ips
         ips = []
+        if @machine.provider_name == :docker
+          @ui.info '[vagrant-goodhosts] Docker detected, adding 127.0.0.1 and ::1 IP addresses'
+          ip = "127.0.0.1"
+          ips.push(ip) unless ip.nil? or ips.include? ip
+          ip = "::1"
+          ips.push(ip) unless ip.nil? or ips.include? ip
+          return ips
+        end
         @machine.config.vm.networks.each do |network|
           key, options = network[0], network[1]
           if options[:goodhosts] == "skip"
