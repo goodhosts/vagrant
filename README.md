@@ -97,7 +97,8 @@ This enable `vagrant-goodhosts` from running the clean command in every call.
 
 ## Suppressing prompts for elevating privileges
 
-These prompts exist to prevent anything that is being run by the user from inadvertently updating the hosts file.
+These prompts exist to prevent anything that is being run by the user from inadvertently updating the hosts file.  
+The command path is printed in red when there are errors with Vagrant eg. if the sudo password is entered incorrectly for 3 times.  
 If you understand the risks that go with supressing them, here's how to do it.
 
 ### Linux/OS X: Passwordless sudo
@@ -108,6 +109,10 @@ The command path is printed when there are errors with Vagrant, check the output
 For Ubuntu and most Linux environments:
 
     %sudo ALL=(root) NOPASSWD: [the-command-path]
+
+An example complete:
+
+    %sudo ALL=(root) NOPASSWD: /home/user/sites/vvv/.vagrant/plugins/gems/3.1.2/gems/vagrant-goodhosts-1.1.6/lib/vagrant-goodhosts/bundle/cli_amd64_linux
 
 For MacOS:
 
