@@ -31,6 +31,14 @@ module VagrantPlugins
           @ui.info "[vagrant-goodhosts] Read guest IP #{ip} from Hyper-V provider"
           ips.push(ip) unless ip.nil? or ips.include? ip
         end
+        if @machine.provider_name == :tart
+          ssh_info = @machine.ssh_info
+          unless ssh_info.nil?
+            ip = @machine.ssh_info[:host]
+            @ui.info "[vagrant-goodhosts] Read guest IP #{ip} from Tart provider"
+            ips.push(ip) unless ip.nil? or ips.include? ip
+          end
+        end
         return ips
       end
 
