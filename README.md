@@ -6,6 +6,8 @@ On **up**, **resume** and **reload** commands, it tries to add the hosts if they
 
 On **halt**, **destroy**, and **suspend**, those entries will be removed again. By setting the `config.goodhosts.remove_on_suspend  = false`, **suspend** and **halt** will not remove them.
 
+Supports: VirtualBox, Hyperv, Docker and Tart.
+
 ## Installation
 
 ```shell
