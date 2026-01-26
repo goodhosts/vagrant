@@ -1,7 +1,6 @@
 # The core of the plugin
 require "rbconfig"
 require "open3"
-require "resolv"
 require "os"
 
 module VagrantPlugins
@@ -98,22 +97,35 @@ module VagrantPlugins
         return true
       end
 
+      # Check if a specific IP/hostname mapping exists in the hosts file
+      # Uses the CLI check command instead of DNS resolution
+      def hosts_entry_exists?(ip_address, hostname)
+        cli = get_cli
+        # Use check command - no sudo needed for read-only operation
+        if cli.include? ".exe"
+          # Windows: direct command execution
+          _stdout, _stderr, status = Open3.capture3("\"#{cli}\" check \"#{ip_address}\" \"#{hostname}\"")
+        else
+          # Unix/macOS: no sudo needed for check
+          _stdout, _stderr, status = Open3.capture3("'#{cli}' check '#{ip_address}' '#{hostname}'")
+        end
+        return status.success?
+      rescue StandardError => e
+        @ui.warn "[vagrant-goodhosts] Error checking host entry: #{e.message}"
+        return false
+      end
+
       def check_hostnames_to_add(ip_address, hostnames)
         hostnames_to_add = Array.new
-        hostnames = hostnames.split
-        # check which hostnames actually need adding
-        hostnames.each do |hostname|
-          begin
-            address = Resolv.getaddress(hostname)
-            if address != ip_address
-              hostnames_to_add.append(hostname)
-            end
-          rescue StandardError => _e
+        hostnames_arr = hostnames.split
+
+        # Check each hostname using the CLI check command
+        hostnames_arr.each do |hostname|
+          unless hosts_entry_exists?(ip_address, hostname)
             hostnames_to_add.append(hostname)
           end
-        rescue StandardError => _e
-          hostnames_to_add.append(hostname)
         end
+
         return hostnames_to_add.join(' ')
       end
 
