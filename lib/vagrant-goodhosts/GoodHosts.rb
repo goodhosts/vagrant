@@ -104,10 +104,10 @@ module VagrantPlugins
         # Use check command - no sudo needed for read-only operation
         if cli.include? ".exe"
           # Windows: direct command execution
-          stdout, stderr, status = Open3.capture3("\"#{cli}\" check \"#{ip_address}\" \"#{hostname}\"")
+          _stdout, _stderr, status = Open3.capture3("\"#{cli}\" check \"#{ip_address}\" \"#{hostname}\"")
         else
           # Unix/macOS: no sudo needed for check
-          stdout, stderr, status = Open3.capture3("'#{cli}' check '#{ip_address}' '#{hostname}'")
+          _stdout, _stderr, status = Open3.capture3("'#{cli}' check '#{ip_address}' '#{hostname}'")
         end
         return status.success?
       rescue StandardError => e
